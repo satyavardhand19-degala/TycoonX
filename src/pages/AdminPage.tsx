@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/gameStore';
-import { MessageSquare, User, Clock, ShieldCheck, Users, LogOut, Edit2, Trash2, Check, X } from 'lucide-react';
+import { MessageSquare, User, Clock, ShieldCheck, Users, LogOut, Edit2, Trash2, Check, X, KeyRound } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { UserRole } from '../types/game.types';
 
@@ -9,11 +9,13 @@ export const AdminPage: React.FC = () => {
   const registeredUsers = useGameStore((state) => state.registeredUsers);
   const user = useGameStore((state) => state.user);
   const logout = useGameStore((state) => state.logout);
-  
+
   const updateUser = useGameStore((state) => state.updateUser);
   const deleteUser = useGameStore((state) => state.deleteUser);
   const updateFeedback = useGameStore((state) => state.updateFeedback);
   const deleteFeedback = useGameStore((state) => state.deleteFeedback);
+  const updateAdminCredentials = useGameStore((state) => state.updateAdminCredentials);
+  const adminSecretKey = useGameStore((state) => state.adminSecretKey);
 
   // Edit State
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -23,6 +25,20 @@ export const AdminPage: React.FC = () => {
 
   const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null);
   const [editFeedbackMsg, setEditFeedbackMsg] = useState('');
+
+  const [newAdminUsername, setNewAdminUsername] = useState(user?.username ?? '');
+  const [newAdminKey, setNewAdminKey] = useState(adminSecretKey);
+  const [credMsg, setCredMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleSaveCredentials = () => {
+    const err = updateAdminCredentials(newAdminUsername, newAdminKey);
+    if (err) {
+      setCredMsg({ type: 'error', text: err });
+    } else {
+      setCredMsg({ type: 'success', text: 'Credentials updated successfully.' });
+    }
+    setTimeout(() => setCredMsg(null), 3000);
+  };
 
   if (!user || user.role !== 'admin') {
     return (
@@ -36,12 +52,13 @@ export const AdminPage: React.FC = () => {
   const handleStartEditUser = (u: any) => {
     setEditingUserId(u.id);
     setEditUsername(u.username);
+    setEditPassword(u.password || '');
     setEditRole(u.role);
   };
 
   const handleSaveUser = () => {
     if (editingUserId && editUsername.trim()) {
-      updateUser(editingUserId, editUsername, editRole);
+      updateUser(editingUserId, editUsername, editRole, editPassword);
       setEditingUserId(null);
     }
   };
@@ -82,7 +99,7 @@ export const AdminPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
           <div className="text-slate-400 text-sm mb-1">Total Users</div>
-          <div className="text-3xl font-bold text-white">{registeredUsers.length}</div>
+          <div className="text-3xl font-bold text-white">{registeredUsers.filter(u => u.role !== 'admin').length}</div>
         </div>
         <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
           <div className="text-slate-400 text-sm mb-1">Total Feedback</div>
@@ -99,21 +116,22 @@ export const AdminPage: React.FC = () => {
           </div>
           
           <div className="divide-y divide-slate-700">
-            {registeredUsers.length === 0 ? (
+            {registeredUsers.filter(u => u.role !== 'admin').length === 0 ? (
               <div className="p-12 text-center text-slate-500">
                 No users registered yet.
               </div>
             ) : (
-              registeredUsers.map((regUser) => (
+              registeredUsers.filter(u => u.role !== 'admin').map((regUser) => (
                 <div key={regUser.id} className="p-4 hover:bg-slate-700/30 transition-colors">
                   {editingUserId === regUser.id ? (
                     <div className="space-y-3">
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
                           value={editUsername}
                           onChange={(e) => setEditUsername(e.target.value)}
-                          className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500"
+                          placeholder="Username"
+                          className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500"
                         />
                         <select
                           value={editRole}
@@ -124,6 +142,13 @@ export const AdminPage: React.FC = () => {
                           <option value="admin">ADMIN</option>
                         </select>
                       </div>
+                      <input
+                        type="text"
+                        value={editPassword}
+                        onChange={(e) => setEditPassword(e.target.value)}
+                        placeholder="Password"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
                       <div className="flex justify-end gap-2">
                         <button onClick={() => setEditingUserId(null)} className="p-1.5 text-slate-400 hover:text-white transition-colors">
                           <X size={18} />
@@ -244,6 +269,55 @@ export const AdminPage: React.FC = () => {
               ))
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Change Credentials */}
+      <div className="mt-8 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+        <div className="p-6 border-b border-slate-700 flex items-center gap-2">
+          <KeyRound className="w-5 h-5 text-orange-400" />
+          <h2 className="text-xl font-bold">Change Admin Credentials</h2>
+        </div>
+        <div className="p-6 space-y-4 max-w-md">
+          {credMsg && (
+            <div className={`p-3 rounded-xl text-sm font-medium text-center border ${
+              credMsg.type === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
+                : 'bg-red-500/10 border-red-500/40 text-red-400'
+            }`}>
+              {credMsg.text}
+            </div>
+          )}
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+              Admin Username
+            </label>
+            <input
+              type="text"
+              value={newAdminUsername}
+              onChange={(e) => setNewAdminUsername(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-white text-sm"
+              placeholder="New username..."
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+              Secret Key (min 6 chars)
+            </label>
+            <input
+              type="text"
+              value={newAdminKey}
+              onChange={(e) => setNewAdminKey(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-white text-sm font-mono"
+              placeholder="New secret key..."
+            />
+          </div>
+          <button
+            onClick={handleSaveCredentials}
+            className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors text-sm active:scale-95"
+          >
+            Save Credentials
+          </button>
         </div>
       </div>
     </div>

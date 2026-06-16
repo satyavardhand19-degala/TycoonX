@@ -13,6 +13,7 @@ interface GameState {
   user: AuthUser | null;
   registeredUsers: AuthUser[];
   feedbackList: Feedback[];
+  adminSecretKey: string;
 
   ownedBusinesses: Record<string, OwnedBusiness>;
   stockHoldings: Record<string, StockHolding>;
@@ -65,12 +66,14 @@ interface GameState {
   toggleSound: () => void;
 
   login: (username: string, role: UserRole, password?: string) => string | null;
+  register: (username: string, password: string) => string | null;
   logout: () => void;
   submitFeedback: (message: string) => void;
   updateUser: (id: string, username: string, role: UserRole, password?: string) => void;
   deleteUser: (id: string) => void;
   updateFeedback: (id: string, message: string) => void;
   deleteFeedback: (id: string) => void;
+  updateAdminCredentials: (newUsername: string, newKey: string) => string | null;
 
   // Computed helpers
   getPerClick: () => number;
@@ -99,6 +102,7 @@ export const useGameStore = create<GameState>()(
       user: null,
       registeredUsers: [],
       feedbackList: [],
+      adminSecretKey: 'admin123',
       ownedBusinesses: {},
       stockHoldings: {},
       propertyHoldings: [],
@@ -323,6 +327,8 @@ export const useGameStore = create<GameState>()(
               error = 'Incorrect password for this username.';
               return;
             }
+            // Admin login overrides role for existing users
+            if (role === 'admin') existing.role = 'admin';
             state.user = existing;
           } else {
             // Register new user
@@ -335,6 +341,18 @@ export const useGameStore = create<GameState>()(
             state.user = newUser;
             state.registeredUsers.push(newUser);
           }
+        });
+        return error;
+      },
+
+      register: (username, password) => {
+        let error: string | null = null;
+        set(state => {
+          const exists = state.registeredUsers.find(u => u.username === username);
+          if (exists) { error = 'Username already taken.'; return; }
+          const newUser = { id: Math.random().toString(36).substring(7), username, password, role: 'user' as UserRole };
+          state.registeredUsers.push(newUser);
+          state.user = newUser;
         });
         return error;
       },
@@ -382,6 +400,19 @@ export const useGameStore = create<GameState>()(
       deleteFeedback: (id) => set(state => {
         state.feedbackList = state.feedbackList.filter(f => f.id !== id);
       }),
+
+      updateAdminCredentials: (newUsername, newKey) => {
+        let error: string | null = null;
+        set(state => {
+          if (!newUsername.trim()) { error = 'Username cannot be empty.'; return; }
+          if (newKey.length < 6) { error = 'Secret key must be at least 6 characters.'; return; }
+          const conflict = state.registeredUsers.find(u => u.username === newUsername && u.role !== 'admin');
+          if (conflict) { error = 'That username is taken by a regular user.'; return; }
+          if (state.user) state.user.username = newUsername;
+          state.adminSecretKey = newKey;
+        });
+        return error;
+      },
 
       applyOfflineEarnings: (seconds) => {
         const incomePerHour = get().getTotalIncomePerHour();

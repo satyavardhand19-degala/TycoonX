@@ -12,7 +12,8 @@
       "Bash(dir \"C:\\\\Users\\\\DELL\\\\Downloads\\\\assest\")",
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(ping -n 3 127.0.0.1)"
+      "Bash(ping -n 3 127.0.0.1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
     ]
   }
 }

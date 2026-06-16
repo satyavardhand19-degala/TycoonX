@@ -7,6 +7,7 @@ export const AdminLoginPage: React.FC = () => {
   const [adminKey, setAdminKey] = useState('');
   const [error, setError] = useState('');
   const login = useGameStore((state) => state.login);
+  const adminSecretKey = useGameStore((state) => state.adminSecretKey);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -14,7 +15,7 @@ export const AdminLoginPage: React.FC = () => {
     setError('');
 
     if (username.trim()) {
-      if (adminKey !== 'admin123') {
+      if (adminKey !== adminSecretKey) {
         setError('Invalid Admin Secret Key');
         return;
       }

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ChevronDown, LogOut, Send, MessageSquare } from 'lucide-react';
+import { LogOut, Send, MessageSquare } from 'lucide-react';
 import { playTax } from '../utils/sounds';
 import { useGameStore } from '../store/gameStore';
 import { formatCurrency } from '../utils/format';
