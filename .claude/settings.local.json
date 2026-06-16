@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\DELL\\\\Downloads\\\\assest\" -Recurse -Force | ForEach-Object { $_.FullName } | Sort-Object)",
+      "PowerShell(Test-Path \"C:\\\\projects_files\\\\TycoonX\"; Get-ChildItem -Path \"C:\\\\projects_files\\\\TycoonX\" -Recurse -Force | ForEach-Object { $_.FullName } | Sort-Object)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\DELL\\\\Desktop\" -Force -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName }; Get-ChildItem -Path \"C:\\\\Users\\\\DELL\\\\Documents\" -Force -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })",
+      "PowerShell(\\(New-Object -ComObject WScript.Shell\\).CreateShortcut\\(\"C:\\\\Users\\\\DELL\\\\Desktop\\\\projects_files.lnk\"\\).TargetPath)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\projects_files\\\\TycoonX\" -Recurse -Force | ForEach-Object { $_.FullName } | Sort-Object)",
+      "Bash(xargs wc -l)",
+      "Bash(xargs grep -l \"interface\\\\|type\")",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\projects_files\\\\TycoonX\" -Depth 3 | Where-Object { $_.PSIsContainer -or $_.Extension -in '.ts','.tsx','.js','.jsx','.json','.css','.html','.md' } | ForEach-Object { $_.FullName.Replace\\('D:\\\\projects_files\\\\TycoonX\\\\', ''\\) } | Sort-Object)",
+      "Bash(dir \"C:\\\\Users\\\\DELL\\\\Downloads\\\\assest\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(ping -n 3 127.0.0.1)"
+    ]
+  }
+}

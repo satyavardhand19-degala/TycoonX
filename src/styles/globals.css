@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+}
+
+/* ── Neumorphism dark theme ── */
+.nm-out {
+  background: #1e1e1e;
+  box-shadow: 6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b;
+}
+
+.nm-in {
+  background: #161616;
+  box-shadow: inset 5px 5px 11px #0d0d0d, inset -4px -4px 9px #272727;
+}
+
+.nm-btn {
+  background: #1e1e1e;
+  box-shadow: 4px 4px 9px #0d0d0d, -3px -3px 7px #2b2b2b;
+  transition: box-shadow 0.12s ease, transform 0.1s ease;
+  cursor: pointer;
+  user-select: none;
+}
+.nm-btn:active {
+  box-shadow: inset 3px 3px 7px #0d0d0d, inset -2px -2px 5px #272727;
+  transform: scale(0.97);
+}
+
+.nm-orange {
+  background: linear-gradient(135deg, #ff8c00, #ff5500);
+  box-shadow: 4px 4px 12px rgba(255,107,0,0.5), -2px -2px 6px rgba(255,140,0,0.12);
+  transition: box-shadow 0.12s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+.nm-orange:active {
+  box-shadow: inset 3px 3px 9px rgba(0,0,0,0.35), 1px 1px 5px rgba(255,107,0,0.2);
+  transform: scale(0.97);
+}
+
+.nm-card {
+  background: #1e1e1e;
+  box-shadow: 7px 7px 16px #0d0d0d, -5px -5px 13px #2d2d2d;
+  border-radius: 20px;
+}
+
+@keyframes coin-float {
+  0%   { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateX(var(--coin-dx, 0px)) translateY(-75px) scale(0.4); opacity: 0; }
+}
