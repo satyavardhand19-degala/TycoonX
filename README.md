@@ -106,6 +106,12 @@ We welcome contributions! Please read `CONTRIBUTING.md` before submitting a pull
 
 ---
 
+## 💡 Inspiration
+
+TycoonX was inspired by **Business Empire** — a mobile idle clicker game. We loved the core loop of building businesses and growing wealth, and set out to create our own version with deeper investment mechanics, a richer UI, and a full admin + support system built in.
+
+---
+
 ## 📬 Contact
 
 - **Email:** satyavardhand19@gmail.com
