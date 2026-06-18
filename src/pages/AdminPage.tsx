@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/gameStore';
-import { MessageSquare, User, Clock, ShieldCheck, Users, LogOut, Edit2, Trash2, Check, X, KeyRound } from 'lucide-react';
+import { MessageSquare, User, Clock, ShieldCheck, Users, LogOut, Edit2, Trash2, Check, X, KeyRound, Reply } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { UserRole } from '../types/game.types';
 
@@ -14,6 +14,7 @@ export const AdminPage: React.FC = () => {
   const deleteUser = useGameStore((state) => state.deleteUser);
   const updateFeedback = useGameStore((state) => state.updateFeedback);
   const deleteFeedback = useGameStore((state) => state.deleteFeedback);
+  const replyFeedback  = useGameStore((state) => state.replyFeedback);
   const updateAdminCredentials = useGameStore((state) => state.updateAdminCredentials);
   const adminSecretKey = useGameStore((state) => state.adminSecretKey);
 
@@ -25,6 +26,8 @@ export const AdminPage: React.FC = () => {
 
   const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null);
   const [editFeedbackMsg, setEditFeedbackMsg] = useState('');
+  const [replyingFeedbackId, setReplyingFeedbackId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   const [newAdminUsername, setNewAdminUsername] = useState(user?.username ?? '');
   const [newAdminKey, setNewAdminKey] = useState(adminSecretKey);
@@ -72,6 +75,19 @@ export const AdminPage: React.FC = () => {
     if (editingFeedbackId && editFeedbackMsg.trim()) {
       updateFeedback(editingFeedbackId, editFeedbackMsg);
       setEditingFeedbackId(null);
+    }
+  };
+
+  const handleStartReply = (f: any) => {
+    setReplyingFeedbackId(f.id);
+    setReplyText(f.reply ?? '');
+  };
+
+  const handleSendReply = () => {
+    if (replyingFeedbackId && replyText.trim()) {
+      replyFeedback(replyingFeedbackId, replyText.trim());
+      setReplyingFeedbackId(null);
+      setReplyText('');
     }
   };
 
@@ -200,70 +216,95 @@ export const AdminPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Feedback Section */}
+        {/* Feedback & Support Section */}
         <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-          <div className="p-6 border-b border-slate-700 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-emerald-400" />
-            <h2 className="text-xl font-bold">Recent Feedback</h2>
+          <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-xl font-bold">Feedback & Support</h2>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              {feedbackList.filter(f => !f.reply).length} pending
+            </span>
           </div>
-          
+
           <div className="divide-y divide-slate-700 max-h-[600px] overflow-y-auto">
             {feedbackList.length === 0 ? (
               <div className="p-12 text-center text-slate-500">
                 No feedback submitted yet.
               </div>
             ) : (
-              [...feedbackList].reverse().map((feedback) => (
-                <div key={feedback.id} className="p-6 hover:bg-slate-700/30 transition-colors">
+              [...feedbackList].reverse().map((fb) => (
+                <div key={fb.id} className={`p-5 transition-colors ${fb.reply ? 'hover:bg-slate-700/20' : 'hover:bg-slate-700/40 border-l-2 border-emerald-500/60'}`}>
+                  {/* Header row */}
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <div className="p-1.5 bg-slate-900 rounded-lg">
                         <User className="w-4 h-4 text-slate-400" />
                       </div>
-                      <span className="font-semibold text-emerald-400">{feedback.username}</span>
+                      <div>
+                        <span className="font-semibold text-emerald-400">{fb.username}</span>
+                        {!fb.reply && (
+                          <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-bold">PENDING</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                        <Clock className="w-3.5 h-3.5" />
-                        {formatDistanceToNow(feedback.timestamp, { addSuffix: true })}
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Clock className="w-3 h-3" />
+                        {formatDistanceToNow(fb.timestamp, { addSuffix: true })}
                       </div>
                       <div className="flex gap-1">
-                        <button 
-                          onClick={() => handleStartEditFeedback(feedback)}
-                          className="p-1 text-slate-500 hover:text-emerald-400 transition-colors"
-                        >
-                          <Edit2 size={14} />
+                        <button onClick={() => handleStartReply(fb)} className="p-1 text-slate-500 hover:text-emerald-400 transition-colors" title="Reply">
+                          <Reply size={14} />
                         </button>
-                        <button 
-                          onClick={() => deleteFeedback(feedback.id)}
-                          className="p-1 text-slate-500 hover:text-red-400 transition-colors"
-                        >
+                        <button onClick={() => deleteFeedback(fb.id)} className="p-1 text-slate-500 hover:text-red-400 transition-colors" title="Delete">
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
                   </div>
-                  
-                  {editingFeedbackId === feedback.id ? (
-                    <div className="mt-3 pl-10 space-y-3">
+
+                  {/* User message */}
+                  <p className="text-slate-300 text-sm leading-relaxed pl-9 mb-3">{fb.message}</p>
+
+                  {/* Existing reply */}
+                  {fb.reply && replyingFeedbackId !== fb.id && (
+                    <div className="ml-9 p-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="text-xs font-bold text-cyan-400">Admin reply</span>
+                        {fb.repliedAt && (
+                          <span className="text-xs text-slate-500 ml-1">· {formatDistanceToNow(fb.repliedAt, { addSuffix: true })}</span>
+                        )}
+                      </div>
+                      <p className="text-slate-300 text-sm leading-relaxed">{fb.reply}</p>
+                    </div>
+                  )}
+
+                  {/* Reply input */}
+                  {replyingFeedbackId === fb.id && (
+                    <div className="ml-9 space-y-2 mt-2">
                       <textarea
-                        value={editFeedbackMsg}
-                        onChange={(e) => setEditFeedbackMsg(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-200 text-sm focus:ring-1 focus:ring-emerald-500 outline-none min-h-[80px]"
+                        value={replyText}
+                        onChange={e => setReplyText(e.target.value)}
+                        placeholder="Type your reply..."
+                        className="w-full bg-slate-900 border border-cyan-500/40 rounded-xl p-3 text-slate-200 text-sm focus:ring-1 focus:ring-cyan-500 outline-none min-h-[80px]"
+                        autoFocus
                       />
                       <div className="flex justify-end gap-2">
-                        <button onClick={() => setEditingFeedbackId(null)} className="p-1.5 text-slate-400 hover:text-white transition-colors">
-                          <X size={18} />
+                        <button onClick={() => setReplyingFeedbackId(null)} className="p-1.5 text-slate-400 hover:text-white transition-colors">
+                          <X size={16} />
                         </button>
-                        <button onClick={handleSaveFeedback} className="p-1.5 text-emerald-400 hover:text-emerald-300 transition-colors">
-                          <Check size={18} />
+                        <button
+                          onClick={handleSendReply}
+                          disabled={!replyText.trim()}
+                          className="flex items-center gap-1.5 px-4 py-1.5 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-40 text-white text-sm font-bold rounded-xl transition-all active:scale-95"
+                        >
+                          <Reply size={14} /> Send Reply
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-slate-300 leading-relaxed pl-10">
-                      {feedback.message}
-                    </p>
                   )}
                 </div>
               ))

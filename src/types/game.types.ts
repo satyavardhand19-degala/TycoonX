@@ -98,4 +98,6 @@ export interface Feedback {
   username: string;
   message: string;
   timestamp: number;
+  reply?: string;
+  repliedAt?: number;
 }

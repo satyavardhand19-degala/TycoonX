@@ -1,8 +1,9 @@
 export const formatCurrency = (value: number): string => {
-  if (value >= 1e12) return `₹ ${(value / 1e12).toFixed(1)} T`;
-  if (value >= 1e9)  return `₹ ${(value / 1e9).toFixed(1)} B`;
-  if (value >= 1e6)  return `₹ ${(value / 1e6).toFixed(1)} M`;
-  if (value >= 1e3)  return `₹ ${(value / 1e3).toFixed(1)} k`;
+  if (value >= 1e12) return `₹ ${(value / 1e12).toFixed(1)} L Cr`;
+  if (value >= 1e10) return `₹ ${(value / 1e10).toFixed(1)} K Cr`;
+  if (value >= 1e7)  return `₹ ${(value / 1e7).toFixed(1)} Cr`;
+  if (value >= 1e5)  return `₹ ${(value / 1e5).toFixed(1)} L`;
+  if (value >= 1e3)  return `₹ ${(value / 1e3).toFixed(1)} K`;
   return `₹ ${value.toFixed(2)}`;
 };
 

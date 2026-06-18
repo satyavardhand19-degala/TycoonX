@@ -267,7 +267,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-    <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
+    <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
       <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
           <div>
@@ -451,7 +451,7 @@ function RealEstateTab() {
       </div>
 
       {showMarket && (
-        <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
+        <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
           <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
             <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
               <div>
@@ -465,7 +465,7 @@ function RealEstateTab() {
                 <X size={18} color="#888" />
               </button>
             </div>
-            <div className="overflow-y-auto p-4 space-y-3">
+            <div className="overflow-y-auto flex-1 min-h-0 p-4 pb-8 space-y-3">
               {PROPERTIES.map(p => {
                 const isOwned     = propertyHoldings.includes(p.id);
                 const level       = propertyLevels[p.id] ?? 1;
@@ -604,7 +604,7 @@ function CryptoTab() {
       </div>
 
       {showBuy && (
-        <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
+        <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
           <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
             <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
               <h3 className="font-bold text-lg text-white">Trade Crypto</h3>

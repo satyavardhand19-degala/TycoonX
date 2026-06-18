@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LogOut, Send, MessageSquare } from 'lucide-react';
+import { LogOut, Send, MessageSquare, KeyRound, ShieldCheck, Clock } from 'lucide-react';
 import { playTax } from '../utils/sounds';
 import { useGameStore } from '../store/gameStore';
 import { formatCurrency } from '../utils/format';
@@ -56,11 +56,19 @@ export function ProfilePage() {
   const user               = useGameStore(s => s.user);
   const logout             = useGameStore(s => s.logout);
   const submitFeedback     = useGameStore(s => s.submitFeedback);
+  const updateUser         = useGameStore(s => s.updateUser);
+  const feedbackList       = useGameStore(s => s.feedbackList);
 
   const [slots, setSlots]       = useState<(SlotMeta | null)[]>(() => [1, 2, 3].map(readSlotMeta));
   const [confirmLoad, setConfirmLoad] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
+
+  const [currentPw, setCurrentPw]   = useState('');
+  const [newPw, setNewPw]           = useState('');
+  const [confirmPw, setConfirmPw]   = useState('');
+  const [pwError, setPwError]       = useState('');
+  const [pwSuccess, setPwSuccess]   = useState(false);
 
   const refreshSlots = useCallback(() => setSlots([1, 2, 3].map(readSlotMeta)), []);
 
@@ -73,6 +81,19 @@ export function ProfilePage() {
     loadSlot(slot);
     refreshSlots();
     setConfirmLoad(null);
+  };
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError('');
+    if (!user) return;
+    if (currentPw !== (user.password ?? '')) { setPwError('Current password is incorrect.'); return; }
+    if (newPw.length < 6) { setPwError('New password must be at least 6 characters.'); return; }
+    if (newPw !== confirmPw) { setPwError('Passwords do not match.'); return; }
+    updateUser(user.id, user.username, user.role, newPw);
+    setCurrentPw(''); setNewPw(''); setConfirmPw('');
+    setPwSuccess(true);
+    setTimeout(() => setPwSuccess(false), 3000);
   };
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
@@ -393,6 +414,61 @@ export function ProfilePage() {
           </button>
         </div>
 
+        {/* Change Password */}
+        {user && user.role !== 'admin' && (
+          <div className="rounded-2xl p-6 mb-4 mt-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+            <div className="flex items-center gap-2 mb-4">
+              <KeyRound className="w-5 h-5" style={{ color: '#FF6B00' }} />
+              <h2 className="text-xl font-bold text-white">Change Password</h2>
+            </div>
+            {pwSuccess ? (
+              <div className="rounded-xl p-4 text-center text-sm font-medium" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.4)', color: '#4ade80' }}>
+                Password updated successfully!
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordChange} className="space-y-3">
+                <input
+                  type="password"
+                  placeholder="Current password"
+                  value={currentPw}
+                  onChange={e => setCurrentPw(e.target.value)}
+                  className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
+                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="New password (min 6 chars)"
+                  value={newPw}
+                  onChange={e => setNewPw(e.target.value)}
+                  className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
+                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPw}
+                  onChange={e => setConfirmPw(e.target.value)}
+                  className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
+                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  required
+                />
+                {pwError && (
+                  <p className="text-xs font-medium" style={{ color: '#ff6666' }}>{pwError}</p>
+                )}
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl font-bold text-white transition-all active:scale-95"
+                  style={{ background: 'linear-gradient(135deg,#7B3F00,#FF6B00)', boxShadow: '0 4px 14px rgba(255,107,0,0.35)' }}
+                >
+                  Update Password
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
         {/* Feedback Section */}
         <div
           className="rounded-2xl p-6 mb-4 mt-8"
@@ -429,6 +505,64 @@ export function ProfilePage() {
             </form>
           )}
         </div>
+
+        {/* My Support Messages */}
+        {user && (() => {
+          const myFeedback = feedbackList.filter(f => f.userId === user.id);
+          if (myFeedback.length === 0) return null;
+          return (
+            <div className="rounded-2xl mb-6 overflow-hidden" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" style={{ color: '#4ade80' }} />
+                  <h2 className="text-lg font-bold text-white">My Support Messages</h2>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-full font-bold" style={{ background: 'rgba(74,222,128,0.1)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.3)' }}>
+                  {myFeedback.length} message{myFeedback.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="divide-y" style={{ borderColor: '#2a2a2a' }}>
+                {[...myFeedback].reverse().map(fb => (
+                  <div key={fb.id} className="p-5">
+                    {/* User's message */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock size={12} style={{ color: '#555' }} />
+                      <span className="text-xs" style={{ color: '#555' }}>
+                        {new Date(fb.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                      {!fb.reply && (
+                        <span className="text-xs px-1.5 py-0.5 rounded font-bold ml-1" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>
+                          Awaiting reply
+                        </span>
+                      )}
+                    </div>
+                    <div className="rounded-xl p-3 mb-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+                      <p className="text-sm text-white leading-relaxed">{fb.message}</p>
+                    </div>
+
+                    {/* Admin reply */}
+                    {fb.reply ? (
+                      <div className="rounded-xl p-3 ml-4" style={{ background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.2)' }}>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <ShieldCheck size={13} style={{ color: '#22d3ee' }} />
+                          <span className="text-xs font-bold" style={{ color: '#22d3ee' }}>Support replied</span>
+                          {fb.repliedAt && (
+                            <span className="text-xs ml-1" style={{ color: '#555' }}>
+                              · {new Date(fb.repliedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>{fb.reply}</p>
+                      </div>
+                    ) : (
+                      <p className="text-xs ml-4" style={{ color: '#444' }}>No reply yet — our team will respond soon.</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
       </div>
     </div>

@@ -8,6 +8,9 @@ import {
 } from '../data/gameData';
 import type { OwnedBusiness, StockHolding, CryptoHolding, AuthUser, Feedback, UserRole } from '../types/game.types';
 
+// Controls how fast money accumulates. 1.0 = full speed, 0.1 = 10x slower.
+const GAME_SPEED = 0.2;
+
 interface GameState {
   balance: number;
   user: AuthUser | null;
@@ -73,6 +76,7 @@ interface GameState {
   deleteUser: (id: string) => void;
   updateFeedback: (id: string, message: string) => void;
   deleteFeedback: (id: string) => void;
+  replyFeedback: (id: string, reply: string) => void;
   updateAdminCredentials: (newUsername: string, newKey: string) => string | null;
 
   // Computed helpers
@@ -255,7 +259,7 @@ export const useGameStore = create<GameState>()(
 
       tick: (deltaSeconds) => set(state => {
         const incomePerHour = get().getTotalIncomePerHour();
-        const earned = (incomePerHour / 3600) * deltaSeconds;
+        const earned = (incomePerHour / 3600) * deltaSeconds * GAME_SPEED;
         state.balance += earned;
         const taxRate = get().getTaxRate();
         if (taxRate > 0) state.taxDue += earned * taxRate;
@@ -401,6 +405,11 @@ export const useGameStore = create<GameState>()(
         state.feedbackList = state.feedbackList.filter(f => f.id !== id);
       }),
 
+      replyFeedback: (id, reply) => set(state => {
+        const f = state.feedbackList.find(fb => fb.id === id);
+        if (f) { f.reply = reply; f.repliedAt = Date.now(); }
+      }),
+
       updateAdminCredentials: (newUsername, newKey) => {
         let error: string | null = null;
         set(state => {
@@ -416,7 +425,7 @@ export const useGameStore = create<GameState>()(
 
       applyOfflineEarnings: (seconds) => {
         const incomePerHour = get().getTotalIncomePerHour();
-        const earned = (incomePerHour / 3600) * seconds;
+        const earned = (incomePerHour / 3600) * seconds * GAME_SPEED;
         if (earned <= 0) return 0;
         const taxRate = get().getTaxRate();
         set(state => {
