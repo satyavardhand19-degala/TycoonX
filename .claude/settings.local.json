@@ -13,7 +13,10 @@
       "Bash(npx tsc *)",
       "Bash(npm run *)",
       "Bash(ping -n 3 127.0.0.1)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5137)",
+      "Bash(npx kill-port *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

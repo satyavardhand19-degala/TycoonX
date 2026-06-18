@@ -108,6 +108,4 @@ We welcome contributions! Please read `CONTRIBUTING.md` before submitting a pull
 
 ## 📬 Contact
 
-- **Email:** dev@tycoonxgame.com
-- **Discord:** discord.gg/tycoonx
-- **Twitter/X:** @TycoonXGame
+- **Email:** satyavardhand19@gmail.com
