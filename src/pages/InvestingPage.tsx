@@ -3,6 +3,8 @@ import { TrendingUp, TrendingDown, ChevronRight, X } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { formatCurrency } from '../utils/format';
 import { STOCKS, PROPERTIES, CRYPTOS } from '../data/gameData';
+
+const STOCK_TOTAL_SHARES = 1000;
 import { playBuy, playSell } from '../utils/sounds';
 
 type InvestTab = 'shares' | 'realestate' | 'crypto';
@@ -30,8 +32,9 @@ function SharesTab() {
   const gain    = portfolioValue - costBasis;
   const gainPct = costBasis > 0 ? (gain / costBasis) * 100 : 0;
 
-  const ownedCount = STOCKS.filter(s => stockHoldings[s.id]?.shares > 0).length;
-  const totalCount = STOCKS.length;
+  const investedCount   = STOCKS.filter(s => (stockHoldings[s.id]?.shares ?? 0) > 0).length;
+  const ownedCount      = STOCKS.filter(s => (stockHoldings[s.id]?.shares ?? 0) >= STOCK_TOTAL_SHARES).length;
+  const totalStockCount = STOCKS.length;
 
   return (
     <div className="p-4 space-y-4">
@@ -56,19 +59,33 @@ function SharesTab() {
         <p className="text-xs" style={{ color: '#888' }}>Estimated yield / hour</p>
         <p className="text-lg font-bold mt-0.5" style={{ color: '#FF6B00' }}>{formatCurrency(yieldPerHour)}</p>
         <div className="h-px mt-3 mb-3" style={{ background: '#2a2a2a' }} />
-        <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: '#888' }}>Companies owned</p>
+
+        {/* Companies invested */}
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-xs" style={{ color: '#888' }}>Companies invested</p>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-white">{investedCount}</span>
+            <span className="text-xs" style={{ color: '#555' }}>/</span>
+            <span className="text-sm font-bold" style={{ color: '#FF6B00' }}>{totalStockCount}</span>
+          </div>
+        </div>
+        <div className="rounded-full overflow-hidden mb-3" style={{ height: 4, background: '#2a2a2a' }}>
+          <div className="h-full rounded-full transition-all"
+            style={{ width: `${(investedCount / totalStockCount) * 100}%`, background: 'linear-gradient(90deg,#FF8C00,#FF5500)' }} />
+        </div>
+
+        {/* Companies owned (all 1000 shares bought) */}
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-xs" style={{ color: '#888' }}>Companies owned <span style={{ color: '#444' }}>({STOCK_TOTAL_SHARES} shares each)</span></p>
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-bold text-white">{ownedCount}</span>
             <span className="text-xs" style={{ color: '#555' }}>/</span>
-            <span className="text-sm font-bold" style={{ color: '#FF6B00' }}>{totalCount}</span>
+            <span className="text-sm font-bold" style={{ color: '#FF6B00' }}>{totalStockCount}</span>
           </div>
         </div>
-        <div className="mt-2 rounded-full overflow-hidden" style={{ height: 4, background: '#2a2a2a' }}>
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ width: `${(ownedCount / totalCount) * 100}%`, background: 'linear-gradient(90deg,#FF8C00,#FF5500)' }}
-          />
+        <div className="rounded-full overflow-hidden" style={{ height: 4, background: '#2a2a2a' }}>
+          <div className="h-full rounded-full transition-all"
+            style={{ width: `${(ownedCount / totalStockCount) * 100}%`, background: 'linear-gradient(90deg,#4CAF50,#2E7D32)' }} />
         </div>
       </div>
 
@@ -139,6 +156,8 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
   const sellStock   = useGameStore(s => s.sellStock);
   const soundEnabled = useGameStore(s => s.soundEnabled);
 
+  const [qty, setQty] = useState(1);
+
   const price      = stockPrices[stockId];
   const holding    = stockHoldings[stockId];
   const changePct  = ((price - stock.basePrice) / stock.basePrice) * 100;
@@ -199,10 +218,15 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
           {/* Holdings */}
           {holding ? (
             <div className="rounded-2xl p-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
-              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>My Holdings</p>
-              <div className="grid grid-cols-2 gap-y-2.5 text-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs uppercase tracking-widest" style={{ color: '#555' }}>My Holdings</p>
+                {holding.shares >= STOCK_TOTAL_SHARES && (
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={{ background: '#1a3d1a', color: '#4CAF50' }}>✓ OWNED</span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-y-2.5 text-sm mb-3">
                 <span style={{ color: '#888' }}>Shares owned</span>
-                <span className="font-bold text-white text-right">{holding.shares.toFixed(4)}</span>
+                <span className="font-bold text-white text-right">{holding.shares.toFixed(0)} / {STOCK_TOTAL_SHARES}</span>
                 <span style={{ color: '#888' }}>Avg buy price</span>
                 <span className="font-bold text-white text-right">{formatCurrency(holding.avgBuyPrice)}</span>
                 <span style={{ color: '#888' }}>Current value</span>
@@ -213,6 +237,22 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
                   <span className="text-xs font-semibold">({holdingsGainPct.toFixed(2)}%)</span>
                 </span>
               </div>
+              {/* Ownership progress */}
+              <div>
+                <div className="flex justify-between text-xs mb-1" style={{ color: '#666' }}>
+                  <span>Ownership</span>
+                  <span>{Math.min(100, (holding.shares / STOCK_TOTAL_SHARES) * 100).toFixed(1)}%</span>
+                </div>
+                <div className="rounded-full overflow-hidden" style={{ height: 5, background: '#2a2a2a' }}>
+                  <div className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${Math.min(100, (holding.shares / STOCK_TOTAL_SHARES) * 100)}%`,
+                      background: holding.shares >= STOCK_TOTAL_SHARES
+                        ? 'linear-gradient(90deg,#2E7D32,#4CAF50)'
+                        : 'linear-gradient(90deg,#7B3F00,#FF6B00)',
+                    }} />
+                </div>
+              </div>
             </div>
           ) : (
             <div className="rounded-2xl p-4 text-center" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
@@ -220,29 +260,66 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
             </div>
           )}
 
+          {/* Quantity selector */}
+          <div className="rounded-2xl p-4" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>Quantity</p>
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={() => setQty(q => Math.max(1, q - 1))}
+                className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              >−</button>
+              <input
+                type="number"
+                min={1}
+                value={qty}
+                onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+                className="flex-1 text-center font-bold text-white text-lg rounded-xl py-2 outline-none"
+                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a' }}
+              />
+              <button
+                onClick={() => setQty(q => q + 1)}
+                className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              >+</button>
+              <button
+                onClick={() => {
+                  const max = Math.floor(balance / price);
+                  setQty(max > 0 ? max : 1);
+                }}
+                className="px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#FF6B00' }}
+              >Max</button>
+            </div>
+            <div className="flex justify-between text-xs" style={{ color: '#666' }}>
+              <span>Total cost</span>
+              <span className="font-bold text-white">{formatCurrency(price * qty)}</span>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex gap-2 pb-2">
             <button
-              onClick={() => { buyStock(stockId, 1); if (soundEnabled) playBuy(); }}
-              disabled={balance < price}
-              className="flex-1 py-3 rounded-xl font-bold text-white disabled:opacity-40"
-              style={{ background: balance >= price ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+              onClick={() => { buyStock(stockId, qty); if (soundEnabled) playBuy(); }}
+              disabled={balance < price * qty}
+              className="flex-1 py-3 rounded-xl font-bold text-white disabled:opacity-40 active:scale-95 transition-all"
+              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
             >
-              Buy 1
+              Buy {qty}
             </button>
-            {holding && holding.shares >= 1 && (
+            {holding && holding.shares >= qty && (
               <button
-                onClick={() => { sellStock(stockId, 1); if (soundEnabled) playSell(); }}
-                className="flex-1 py-3 rounded-xl font-bold"
+                onClick={() => { sellStock(stockId, qty); if (soundEnabled) playSell(); }}
+                className="flex-1 py-3 rounded-xl font-bold active:scale-95 transition-all"
                 style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
               >
-                Sell 1
+                Sell {qty}
               </button>
             )}
             {holding && holding.shares > 0 && (
               <button
                 onClick={() => { sellStock(stockId, holding.shares); if (soundEnabled) playSell(); }}
-                className="px-4 py-3 rounded-xl font-bold"
+                className="px-4 py-3 rounded-xl font-bold active:scale-95 transition-all"
                 style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
               >
                 All
@@ -273,8 +350,9 @@ function StockModal({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="font-bold text-lg text-white">Stock Market</h3>
             <p className="text-xs mt-0.5" style={{ color: '#666' }}>
-              <span style={{ color: '#FF6B00' }}>{Object.values(stockHoldings).filter(h => h.shares > 0).length}</span>
-              <span> / {STOCKS.length} companies owned</span>
+              <span style={{ color: '#FF6B00' }}>{Object.values(stockHoldings).filter(h => h.shares >= STOCK_TOTAL_SHARES).length}</span>
+              <span> / {STOCKS.length} companies owned · </span>
+              <span style={{ color: '#888' }}>{Object.values(stockHoldings).filter(h => h.shares > 0).length} invested</span>
             </p>
           </div>
           <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={onClose}>
@@ -307,8 +385,10 @@ function StockModal({ onClose }: { onClose: () => void }) {
                       </p>
                     </div>
                     {holding && (
-                      <p className="text-xs" style={{ color: '#FF6B00' }}>
-                        {holding.shares.toFixed(2)} owned · {formatCurrency(holding.shares * price)}
+                      <p className="text-xs" style={{ color: holding.shares >= STOCK_TOTAL_SHARES ? '#4CAF50' : '#FF6B00' }}>
+                        {holding.shares >= STOCK_TOTAL_SHARES
+                          ? '✓ Owned · ' + formatCurrency(holding.shares * price)
+                          : `${holding.shares.toFixed(0)} / ${STOCK_TOTAL_SHARES} shares · ${formatCurrency(holding.shares * price)}`}
                       </p>
                     )}
                   </div>

@@ -2,31 +2,29 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 
-export const AuthPage: React.FC = () => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+const NM_OUT  = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
+const NM_IN   = 'inset 2px 2px 6px #0d0d0d, inset -2px -2px 6px #272727';
 
-  const login = useGameStore((state) => state.login);
-  const register = useGameStore((state) => state.register);
+export const AuthPage: React.FC = () => {
+  const [mode, setMode]                   = useState<'login' | 'register'>('login');
+  const [username, setUsername]           = useState('');
+  const [password, setPassword]           = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError]                 = useState('');
+
+  const login    = useGameStore(s => s.login);
+  const register = useGameStore(s => s.register);
   const navigate = useNavigate();
 
   const switchMode = (m: 'login' | 'register') => {
-    setMode(m);
-    setError('');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
+    setMode(m); setError('');
+    setUsername(''); setPassword(''); setConfirmPassword('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
     if (!username.trim()) return;
-
     if (mode === 'register') {
       if (password.length < 4) { setError('Password must be at least 4 characters.'); return; }
       if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
@@ -39,118 +37,146 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-slate-900 text-white">
-      <div className="w-full max-w-md">
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-10 overflow-hidden" style={{ background: '#1a1a1a' }}>
+
+      {/* Decorative background glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full opacity-10 pointer-events-none"
+        style={{ background: 'radial-gradient(circle, #FF6B00 0%, transparent 70%)', filter: 'blur(40px)' }} />
+      <div className="absolute bottom-10 right-0 w-60 h-60 rounded-full opacity-5 pointer-events-none"
+        style={{ background: 'radial-gradient(circle, #FF6B00 0%, transparent 70%)', filter: 'blur(50px)' }} />
+
+      {/* Floating coin emojis */}
+      <span className="absolute top-10 left-5 text-3xl opacity-20 rotate-12 select-none pointer-events-none">🪙</span>
+      <span className="absolute top-20 right-8 text-xl opacity-15 -rotate-6 select-none pointer-events-none">💰</span>
+      <span className="absolute bottom-28 left-8 text-2xl opacity-10 rotate-6 select-none pointer-events-none">💎</span>
+      <span className="absolute bottom-16 right-6 text-2xl opacity-15 -rotate-12 select-none pointer-events-none">🏆</span>
+
+      <div className="w-full max-w-sm relative z-10">
+
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
-            TycoonX
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">Become a Billionaire</p>
+        <div className="flex justify-center mb-10">
+          <img src="/logo.svg" alt="TycoonX" className="w-64 h-auto" />
         </div>
 
-        {/* Tab switcher */}
-        <div className="flex bg-slate-800 rounded-2xl p-1 mb-6 border border-slate-700">
-          <button
-            onClick={() => switchMode('login')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              mode === 'login'
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => switchMode('register')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              mode === 'register'
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Register
-          </button>
-        </div>
+        {/* Card */}
+        <div className="rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
 
-        {/* Form card */}
-        <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl">
-          <h2 className="text-xl font-bold mb-1">
-            {mode === 'login' ? 'Welcome back' : 'Create account'}
-          </h2>
-          <p className="text-slate-400 text-sm mb-6">
-            {mode === 'login'
-              ? 'Login to continue your empire'
-              : 'Join TycoonX and start building wealth'}
-          </p>
+          {/* Tab switcher */}
+          <div className="flex rounded-2xl p-1 mb-6" style={{ background: '#161616', boxShadow: NM_IN }}>
+            {(['login', 'register'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => switchMode(tab)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
+                style={mode === tab ? {
+                  background: 'linear-gradient(135deg, #7B3F00, #FF6B00)',
+                  color: '#fff',
+                  boxShadow: '0 4px 12px rgba(255,107,0,0.4)',
+                } : { color: '#666' }}
+              >
+                {tab === 'login' ? 'Login' : 'Register'}
+              </button>
+            ))}
+          </div>
+
+          {/* Heading */}
+          <div className="mb-5">
+            <h2 className="text-xl font-bold text-white">
+              {mode === 'login' ? 'Welcome back 👋' : 'Join TycoonX 🚀'}
+            </h2>
+            <p className="text-xs mt-1" style={{ color: '#666' }}>
+              {mode === 'login' ? 'Login to continue your empire' : 'Create your billionaire account'}
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm text-center font-medium">
+              <div className="rounded-xl px-4 py-3 text-sm font-medium text-center"
+                style={{ background: 'rgba(255,60,60,0.08)', border: '1px solid rgba(255,60,60,0.3)', color: '#ff6b6b' }}>
                 {error}
               </div>
             )}
 
+            {/* Username */}
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: '#888' }}>
                 Username
               </label>
               <input
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none text-white"
+                onChange={e => setUsername(e.target.value)}
                 placeholder="Enter username..."
+                className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
+                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
+                onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
               />
             </div>
 
+            {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: '#888' }}>
                 Password
               </label>
               <input
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none text-white"
+                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
+                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
+                onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
               />
             </div>
 
+            {/* Confirm Password */}
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: '#888' }}>
                   Confirm Password
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none text-white"
+                  onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
+                  style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                  onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
+                  onBlur={e => (e.target.style.boxShadow = NM_IN)}
                   required
                 />
               </div>
             )}
 
+            {/* Submit */}
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-orange-500/25 active:scale-[0.98] mt-2"
+              className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all active:scale-95 mt-2"
+              style={{
+                background: 'linear-gradient(135deg, #7B3F00, #FF6B00)',
+                boxShadow: '0 4px 16px rgba(255,107,0,0.4)',
+              }}
             >
-              {mode === 'login' ? 'Login' : 'Create Account'}
+              {mode === 'login' ? '🎮  Enter Game' : '🚀  Create Account'}
             </button>
           </form>
         </div>
 
-        {/* Admin link */}
+        {/* Hidden admin link */}
         <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/admin-auth')}
-            className="text-xs text-slate-700 hover:text-slate-500 transition-colors"
+            className="text-xs transition-colors"
+            style={{ color: '#2a2a2a' }}
+            onMouseEnter={e => ((e.target as HTMLElement).style.color = '#444')}
+            onMouseLeave={e => ((e.target as HTMLElement).style.color = '#2a2a2a')}
           >
-            .
+            ·
           </button>
         </div>
       </div>

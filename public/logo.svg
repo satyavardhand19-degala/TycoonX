@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80">
+  <defs>
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#CC4400"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFD580"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Coin icon -->
+  <circle cx="40" cy="40" r="34" fill="url(#coinGrad)" filter="url(#shadow)"/>
+  <circle cx="40" cy="40" r="29" fill="none" stroke="#FFAA33" stroke-width="1.2" opacity="0.5"/>
+
+  <!-- Crown -->
+  <path d="M25 32 L29 24 L33 30 L40 20 L47 30 L51 24 L55 32 Z"
+        fill="#FFD580" opacity="0.95" filter="url(#glow)"/>
+  <rect x="24" y="31" width="32" height="4.5" rx="2" fill="#FFD580" opacity="0.9"/>
+
+  <!-- TX inside coin -->
+  <text x="40" y="60"
+        text-anchor="middle"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        font-size="22"
+        fill="url(#textGrad)"
+        letter-spacing="-1">TX</text>
+
+  <!-- TYCOON text -->
+  <text x="90" y="46"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        font-size="34"
+        fill="#FFFFFF"
+        letter-spacing="1">TYCOON</text>
+
+  <!-- X in orange -->
+  <text x="90" y="46"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        font-size="34"
+        fill="#FFFFFF"
+        letter-spacing="1"
+        opacity="0">TYCOON</text>
+
+  <text x="264" y="46"
+        font-family="Arial Black, Impact, sans-serif"
+        font-weight="900"
+        font-size="34"
+        fill="#FF6B00"
+        filter="url(#glow)">X</text>
+
+  <!-- Tagline -->
+  <text x="90" y="64"
+        font-family="Arial, sans-serif"
+        font-size="11"
+        fill="#888888"
+        letter-spacing="3">BILLIONAIRE SIMULATOR</text>
+</svg>
