@@ -176,15 +176,15 @@ export const useGameStore = create<GameState>()(
         if (!def || state.balance < def.cost || state.propertyHoldings.includes(id)) return;
         state.balance -= def.cost;
         state.propertyHoldings.push(id);
-        state.propertyLevels[id] = 1;
+        state.propertyLevels[id] = 0;
       }),
 
       upgradeProperty: (id) => set(state => {
         const def = PROPERTIES.find(p => p.id === id);
         if (!def || !state.propertyHoldings.includes(id)) return;
-        const level = state.propertyLevels[id] ?? 1;
-        if (level >= 10) return;
-        const cost = def.cost * 0.5 * level;
+        const level = state.propertyLevels[id] ?? 0;
+        if (level >= 5) return;
+        const cost = def.cost * 0.2 * (level + 1);
         if (state.balance < cost) return;
         state.balance -= cost;
         state.propertyLevels[id] = level + 1;
@@ -523,8 +523,8 @@ export const useGameStore = create<GameState>()(
         const { propertyHoldings, propertyLevels } = get();
         return PROPERTIES.reduce((total, def) => {
           if (!propertyHoldings.includes(def.id)) return total;
-          const level = propertyLevels[def.id] ?? 1;
-          return total + def.rentalIncomePerHour * level;
+          const level = propertyLevels[def.id] ?? 0;
+          return total + def.rentalIncomePerHour * (level + 1);
         }, 0);
       },
 

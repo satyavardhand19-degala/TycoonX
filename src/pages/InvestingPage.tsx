@@ -5,6 +5,13 @@ import { formatCurrency } from '../utils/format';
 import { STOCKS, PROPERTIES, CRYPTOS } from '../data/gameData';
 
 const STOCK_TOTAL_SHARES = 1000;
+const PROPERTY_IMPROVEMENTS = [
+  { icon: '🖌️', name: 'Paint & Renovate' },
+  { icon: '🧊', name: 'Appliances' },
+  { icon: '🛋️', name: 'Furniture' },
+  { icon: '🔌', name: 'Electrical' },
+  { icon: '🅿️', name: 'Parking' },
+];
 import { playBuy, playSell } from '../utils/sounds';
 
 type InvestTab = 'shares' | 'realestate' | 'crypto';
@@ -498,8 +505,137 @@ function StockModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function PropertyDetailModal({ propertyId, onClose }: { propertyId: string; onClose: () => void }) {
+  const p               = PROPERTIES.find(pr => pr.id === propertyId)!;
+  const propertyLevels  = useGameStore(s => s.propertyLevels);
+  const balance         = useGameStore(s => s.balance);
+  const upgradeProperty = useGameStore(s => s.upgradeProperty);
+
+  const level       = propertyLevels[propertyId] ?? 0;
+  const income      = p.rentalIncomePerHour * (level + 1);
+  const marketValue = p.cost * 0.8;
+  const upgradeCost = p.cost * 0.2 * (level + 1);
+  const maxed       = level >= 5;
+  const canUpgrade  = !maxed && balance >= upgradeCost;
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.88)' }}>
+      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={onClose}>
+            <X size={18} color="#888" />
+          </button>
+          <p className="font-bold text-white text-lg flex-1 truncate">{p.name}</p>
+        </div>
+
+        <div className="overflow-y-auto p-5 space-y-4">
+          {/* Property image placeholder */}
+          <div
+            className="w-full rounded-2xl flex flex-col items-center justify-center py-10"
+            style={{ background: 'linear-gradient(135deg,#1e1e1e,#2a2a2a)', boxShadow: NM_OUT, minHeight: 160 }}
+          >
+            <span className="text-6xl mb-3">🏠</span>
+            <p className="font-bold text-white text-lg text-center px-4">{p.name}</p>
+          </div>
+
+          {/* Income + location row */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-2xl font-bold" style={{ color: '#FF6B00' }}>{formatCurrency(income)}</p>
+              <p className="text-xs mt-0.5" style={{ color: '#888' }}>Income per hour</p>
+            </div>
+            <div className="text-right flex items-center gap-1.5">
+              <span className="text-sm" style={{ color: '#555' }}>📍</span>
+              <p className="text-sm font-semibold text-white">{p.location}</p>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: '#2a2a2a' }} />
+
+          {/* Improvements */}
+          <div>
+            <p className="font-bold text-white text-base mb-3">Improvements</p>
+            <div className="flex items-center gap-3 mb-3">
+              {PROPERTY_IMPROVEMENTS.map((imp, i) => {
+                const bought = i < level;
+                const isNext = i === level && !maxed;
+                return (
+                  <button
+                    key={imp.name}
+                    onClick={() => isNext && canUpgrade ? upgradeProperty(propertyId) : undefined}
+                    disabled={!isNext || !canUpgrade}
+                    title={bought ? `${imp.name} ✓` : isNext ? `${imp.name} · ${formatCurrency(upgradeCost)}` : imp.name}
+                    className="flex-1 py-3 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95"
+                    style={{
+                      background: bought ? 'rgba(255,107,0,0.18)' : '#1e1e1e',
+                      boxShadow: bought ? '0 0 10px rgba(255,107,0,0.3), inset 2px 2px 5px #0d0d0d' : NM_OUT,
+                      border: isNext ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
+                      opacity: i > level ? 0.3 : 1,
+                      cursor: isNext && canUpgrade ? 'pointer' : 'default',
+                    }}
+                  >
+                    <span className="text-2xl">{imp.icon}</span>
+                    <span className="text-xs font-semibold" style={{ color: bought ? '#FF6B00' : isNext ? '#aaa' : '#555' }}>
+                      {bought ? '✓' : imp.name.split(' ')[0]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {!maxed ? (
+              <div
+                className="rounded-xl p-3"
+                style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs" style={{ color: '#888' }}>Next improvement</p>
+                    <p className="text-sm font-bold" style={{ color: canUpgrade ? '#FF6B00' : '#555' }}>
+                      {PROPERTY_IMPROVEMENTS[level].icon} {PROPERTY_IMPROVEMENTS[level].name}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => upgradeProperty(propertyId)}
+                    disabled={!canUpgrade}
+                    className="px-4 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40 active:scale-95 transition-all"
+                    style={{
+                      background: canUpgrade ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#2a2a2a',
+                      boxShadow: canUpgrade ? '0 3px 10px rgba(255,107,0,0.3)' : 'none',
+                    }}
+                  >
+                    {formatCurrency(upgradeCost)}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(76,175,80,0.08)', border: '1px solid rgba(76,175,80,0.25)' }}>
+                <p className="text-sm font-bold" style={{ color: '#4CAF50' }}>All improvements done ✓</p>
+              </div>
+            )}
+          </div>
+
+          {/* Market value */}
+          <div style={{ height: 1, background: '#2a2a2a' }} />
+          <div className="flex items-center justify-between pb-2">
+            <div>
+              <p className="text-xs" style={{ color: '#888' }}>Market value</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(marketValue)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type PropertySort = 'expensive' | 'cheap' | 'improvement_available' | 'fully_improved';
+
 function RealEstateTab() {
-  const [showMarket, setShowMarket] = useState(false);
+  const [showMarket,          setShowMarket]          = useState(false);
+  const [showMyProperty,      setShowMyProperty]      = useState(false);
+  const [selectedPropertyId,  setSelectedPropertyId]  = useState<string | null>(null);
+  const [propSort,            setPropSort]            = useState<PropertySort>('expensive');
 
   const propertyHoldings       = useGameStore(s => s.propertyHoldings);
   const propertyLevels         = useGameStore(s => s.propertyLevels);
@@ -510,6 +646,15 @@ function RealEstateTab() {
 
   const rentalIncome = getRentalIncomePerHour();
   const owned = PROPERTIES.filter(p => propertyHoldings.includes(p.id));
+
+  const sortedOwned = [...owned].filter(p => {
+    if (propSort === 'improvement_available') return (propertyLevels[p.id] ?? 0) < 5;
+    if (propSort === 'fully_improved')        return (propertyLevels[p.id] ?? 0) >= 5;
+    return true;
+  }).sort((a, b) => {
+    if (propSort === 'cheap') return a.cost - b.cost;
+    return b.cost - a.cost;
+  });
 
   return (
     <div className="p-4 space-y-4">
@@ -544,56 +689,118 @@ function RealEstateTab() {
         <ChevronRight size={18} color="#555" />
       </button>
 
-      {/* My properties */}
-      <div className="nm-card p-4">
-        <p className="font-bold text-white mb-3">My property</p>
-        {owned.length === 0 ? (
-          <p className="text-sm text-center py-4" style={{ color: '#555' }}>No properties yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {owned.map(p => {
-              const level       = propertyLevels[p.id] ?? 1;
-              const income      = p.rentalIncomePerHour * level;
-              const upgradeCost = p.cost * 0.5 * level;
-              const maxed       = level >= 10;
-              const canUpgrade  = !maxed && balance >= upgradeCost;
-              return (
-                <div key={p.id} className="rounded-2xl p-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-white text-sm">{p.name}</p>
-                        <span className="text-xs px-1.5 py-0.5 rounded-md font-bold"
-                          style={{ background: maxed ? '#7B3F00' : '#2a2a2a', color: maxed ? '#FF8C00' : '#FF6B00' }}>
-                          Lv.{level}{maxed ? ' MAX' : ''}
-                        </span>
-                      </div>
-                      <p className="text-xs mt-0.5" style={{ color: '#555' }}>{p.location}</p>
-                    </div>
-                    <span className="font-bold text-sm shrink-0" style={{ color: '#FF6B00' }}>
-                      {formatCurrency(income)}/hr
-                    </span>
-                  </div>
-                  {!maxed && (
-                    <button
-                      onClick={() => upgradeProperty(p.id)}
-                      disabled={!canUpgrade}
-                      className="w-full py-2 rounded-xl text-xs font-bold disabled:opacity-40"
-                      style={{
-                        background: canUpgrade ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
-                        boxShadow: canUpgrade ? '0 2px 8px rgba(255,107,0,0.3)' : NM_OUT,
-                        color: '#fff',
-                      }}
-                    >
-                      Upgrade → Lv.{level + 1} &nbsp;·&nbsp; {formatCurrency(upgradeCost)} &nbsp;·&nbsp; +{formatCurrency(p.rentalIncomePerHour)}/hr
-                    </button>
-                  )}
+      {/* My property button */}
+      <button
+        onClick={() => setShowMyProperty(true)}
+        className="nm-card w-full p-5 text-left flex items-center gap-4"
+      >
+        <span className="text-3xl">🏠</span>
+        <div className="flex-1">
+          <p className="font-bold text-white">My property</p>
+          <p className="text-sm" style={{ color: '#888' }}>
+            {owned.length === 0 ? 'No properties yet' : `${owned.length} propert${owned.length === 1 ? 'y' : 'ies'} owned`}
+          </p>
+        </div>
+        <ChevronRight size={18} color="#555" />
+      </button>
+
+      {/* My property modal */}
+      {showMyProperty && (
+        <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
+          <div className="w-full max-h-[90vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+            <div className="px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-bold text-lg text-white">My property</h3>
+                  <p className="text-xs mt-0.5" style={{ color: '#666' }}>
+                    <span style={{ color: '#FF6B00' }}>{owned.length}</span>
+                    <span> / {PROPERTIES.length} properties owned</span>
+                  </p>
                 </div>
-              );
-            })}
+                <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={() => setShowMyProperty(false)}>
+                  <X size={18} color="#888" />
+                </button>
+              </div>
+              {/* Sort / filter pills */}
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {([
+                  { key: 'expensive',             label: 'Expensive first' },
+                  { key: 'cheap',                 label: 'Cheap first' },
+                  { key: 'improvement_available', label: 'Improvement available' },
+                  { key: 'fully_improved',        label: 'Fully improved' },
+                ] as { key: PropertySort; label: string }[]).map(opt => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setPropSort(opt.key)}
+                    className="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95"
+                    style={{
+                      background: propSort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
+                      boxShadow: NM_OUT,
+                      color: propSort === opt.key ? '#fff' : '#666',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="overflow-y-auto flex-1 min-h-0 p-4 pb-8 space-y-3">
+              {owned.length === 0 ? (
+                <p className="text-sm text-center py-8" style={{ color: '#555' }}>No properties yet. Buy some from the market!</p>
+              ) : sortedOwned.length === 0 ? (
+                <p className="text-sm text-center py-8" style={{ color: '#555' }}>
+                  {propSort === 'fully_improved' ? 'No fully improved properties yet.' : 'No properties available to improve.'}
+                </p>
+              ) : sortedOwned.map(p => {
+                const level  = propertyLevels[p.id] ?? 0;
+                const income = p.rentalIncomePerHour * (level + 1);
+                const maxed  = level >= 5;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedPropertyId(p.id)}
+                    className="w-full text-left nm-card p-4 active:scale-[0.99] transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-white text-sm">{p.name}</p>
+                        <p className="text-xs mt-0.5" style={{ color: '#555' }}>{p.location}</p>
+                      </div>
+                      <span className="font-bold text-sm shrink-0" style={{ color: '#FF6B00' }}>
+                        {formatCurrency(income)}/hr
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {PROPERTY_IMPROVEMENTS.map((imp, i) => (
+                        <div
+                          key={imp.name}
+                          className="w-9 h-9 rounded-xl flex items-center justify-center text-sm"
+                          style={{
+                            background: i < level ? 'rgba(255,107,0,0.18)' : '#1a1a1a',
+                            boxShadow: i < level ? '0 0 6px rgba(255,107,0,0.3), inset 2px 2px 5px #0d0d0d' : 'inset 2px 2px 5px #0d0d0d',
+                            border: i === level && !maxed ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
+                            opacity: i > level ? 0.3 : 1,
+                          }}
+                        >
+                          {imp.icon}
+                        </div>
+                      ))}
+                      <ChevronRight size={14} color="#444" className="ml-auto" />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {selectedPropertyId && (
+        <PropertyDetailModal
+          propertyId={selectedPropertyId}
+          onClose={() => setSelectedPropertyId(null)}
+        />
+      )}
 
       {showMarket && (
         <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
@@ -613,40 +820,20 @@ function RealEstateTab() {
             <div className="overflow-y-auto flex-1 min-h-0 p-4 pb-8 space-y-3">
               {PROPERTIES.map(p => {
                 const isOwned     = propertyHoldings.includes(p.id);
-                const level       = propertyLevels[p.id] ?? 1;
-                const income      = isOwned ? p.rentalIncomePerHour * level : p.rentalIncomePerHour;
-                const upgradeCost = p.cost * 0.5 * level;
-                const maxed       = level >= 10;
+                const level       = propertyLevels[p.id] ?? 0;
+                const income      = isOwned ? p.rentalIncomePerHour * (level + 1) : p.rentalIncomePerHour;
+                const upgradeCost = p.cost * 0.2 * (level + 1);
+                const maxed       = level >= 5;
+                const canUpgrade  = !maxed && balance >= upgradeCost;
                 return (
                   <div key={p.id} className="nm-card p-4">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center justify-between gap-2 mb-2">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-bold text-white text-sm">{p.name}</p>
-                          {isOwned && (
-                            <span className="text-xs px-1.5 py-0.5 rounded-md font-bold"
-                              style={{ background: maxed ? '#7B3F00' : '#2a2a2a', color: maxed ? '#FF8C00' : '#FF6B00' }}>
-                              Lv.{level}{maxed ? ' MAX' : ''}
-                            </span>
-                          )}
-                        </div>
+                        <p className="font-bold text-white text-sm">{p.name}</p>
                         <p className="text-xs mt-0.5" style={{ color: '#666' }}>{p.location}</p>
                         <p className="text-xs font-semibold mt-0.5" style={{ color: '#FF6B00' }}>{formatCurrency(income)}/hr</p>
                       </div>
-                      {isOwned ? (
-                        <button
-                          onClick={() => upgradeProperty(p.id)}
-                          disabled={maxed || balance < upgradeCost}
-                          className="shrink-0 px-3 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
-                          style={{
-                            background: (!maxed && balance >= upgradeCost) ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
-                            boxShadow: (!maxed && balance >= upgradeCost) ? '0 2px 8px rgba(255,107,0,0.3)' : NM_OUT,
-                            color: '#fff',
-                          }}
-                        >
-                          {maxed ? 'MAX' : `Upgrade\n${formatCurrency(upgradeCost)}`}
-                        </button>
-                      ) : (
+                      {!isOwned && (
                         <button
                           onClick={() => buyProperty(p.id)}
                           disabled={balance < p.cost}
@@ -657,6 +844,42 @@ function RealEstateTab() {
                         </button>
                       )}
                     </div>
+                    {isOwned && (
+                      <div>
+                        <p className="text-xs mb-1.5" style={{ color: '#555' }}>Improvements</p>
+                        <div className="flex items-center gap-2">
+                          {PROPERTY_IMPROVEMENTS.map((imp, i) => {
+                            const bought = i < level;
+                            const isNext = i === level && !maxed;
+                            return (
+                              <button
+                                key={imp.name}
+                                onClick={() => isNext && canUpgrade ? upgradeProperty(p.id) : undefined}
+                                disabled={!isNext || !canUpgrade}
+                                title={bought ? `${imp.name} ✓` : isNext ? `${imp.name} · ${formatCurrency(upgradeCost)}` : imp.name}
+                                className="w-10 h-10 rounded-xl flex items-center justify-center text-base transition-all active:scale-95"
+                                style={{
+                                  background: bought ? 'rgba(255,107,0,0.18)' : '#1a1a1a',
+                                  boxShadow: bought ? '0 0 8px rgba(255,107,0,0.35), inset 2px 2px 5px #0d0d0d' : 'inset 2px 2px 5px #0d0d0d',
+                                  border: isNext ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
+                                  opacity: i > level ? 0.3 : 1,
+                                  cursor: isNext && canUpgrade ? 'pointer' : 'default',
+                                }}
+                              >
+                                {imp.icon}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {!maxed ? (
+                          <p className="text-xs mt-1.5" style={{ color: canUpgrade ? '#FF6B00' : '#555' }}>
+                            Next: {formatCurrency(upgradeCost)}
+                          </p>
+                        ) : (
+                          <p className="text-xs mt-1.5 font-bold" style={{ color: '#4CAF50' }}>All improvements done ✓</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
