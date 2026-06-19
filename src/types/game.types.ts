@@ -79,7 +79,7 @@ export interface ClickUpgradeDef {
   id: string;
   name: string;
   description: string;
-  multiplier: number;
+  clickValue: number;
   cost: number;
 }
 

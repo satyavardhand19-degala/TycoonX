@@ -668,151 +668,446 @@ function RealEstateTab() {
   );
 }
 
-function CryptoTab() {
-  const [showBuy, setShowBuy] = useState(false);
+function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () => void }) {
+  const coin           = CRYPTOS.find(c => c.id === coinId)!;
+  const cryptoPrices   = useGameStore(s => s.cryptoPrices);
+  const cryptoHoldings = useGameStore(s => s.cryptoHoldings);
+  const balance        = useGameStore(s => s.balance);
+  const buyCrypto      = useGameStore(s => s.buyCrypto);
+  const sellCrypto     = useGameStore(s => s.sellCrypto);
+  const soundEnabled   = useGameStore(s => s.soundEnabled);
 
-  const cryptoHoldings          = useGameStore(s => s.cryptoHoldings);
-  const cryptoPrices            = useGameStore(s => s.cryptoPrices);
-  const balance                 = useGameStore(s => s.balance);
-  const buyCrypto               = useGameStore(s => s.buyCrypto);
-  const sellCrypto              = useGameStore(s => s.sellCrypto);
-  const getCryptoPortfolioValue = useGameStore(s => s.getCryptoPortfolioValue);
-  const soundEnabled            = useGameStore(s => s.soundEnabled);
+  const [qty, setQty] = useState(1);
 
-  const totalValue = getCryptoPortfolioValue();
-  const costBasis  = CRYPTOS.reduce((t, c) => {
-    const h = cryptoHoldings[c.id];
-    return h ? t + h.amount * h.avgBuyPrice : t;
-  }, 0);
-  const gain    = totalValue - costBasis;
-  const gainPct = costBasis > 0 ? (gain / costBasis) * 100 : 0;
+  const price     = cryptoPrices[coinId];
+  const holding   = cryptoHoldings[coinId];
+  const changePct = ((price - coin.basePrice) / coin.basePrice) * 100;
+  const isUp      = changePct >= 0;
+  const marketCap = coin.totalSupply * price;
+
+  const holdingsValue   = holding ? holding.amount * price : 0;
+  const holdingsCost    = holding ? holding.amount * holding.avgBuyPrice : 0;
+  const holdingsGain    = holdingsValue - holdingsCost;
+  const holdingsGainPct = holdingsCost > 0 ? (holdingsGain / holdingsCost) * 100 : 0;
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Total card */}
-      <div className="nm-card p-5" style={{ borderLeft: '3px solid #FF6B00' }}>
-        <p className="text-xs uppercase tracking-widest mb-2" style={{ color: '#888' }}>Total Crypto Value</p>
-        <p className="text-2xl font-bold text-white">{formatCurrency(totalValue)}</p>
-        {gain !== 0 && (
-          <p className={`text-sm font-semibold mt-1 flex items-center gap-1 ${gain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {gain >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            {formatCurrency(Math.abs(gain))} ({Math.abs(gainPct).toFixed(2)}%)
-          </p>
-        )}
-        <button
-          onClick={() => setShowBuy(true)}
-          className="nm-orange text-white px-6 py-2 rounded-xl text-sm font-bold mt-4 inline-block"
-        >
-          Trade Crypto
-        </button>
+    <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.88)' }}>
+      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
+            style={{ background: coin.color, boxShadow: `0 0 18px ${coin.color}66` }}
+          >
+            {coin.ticker.slice(0, 3)}
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-white text-lg leading-none">{coin.name}</p>
+            <p className="text-xs mt-0.5" style={{ color: '#888' }}>{coin.ticker} · Crypto</p>
+          </div>
+          <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={onClose}>
+            <X size={18} color="#888" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-5 space-y-4">
+          {/* Live price */}
+          <div>
+            <p className="text-3xl font-bold text-white">{formatCurrency(price)}</p>
+            <p className={`text-sm font-semibold flex items-center gap-1 mt-0.5 ${isUp ? 'text-green-500' : 'text-red-500'}`}>
+              {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              {isUp ? '+' : ''}{changePct.toFixed(2)}% from base price
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'Market Cap',   value: formatCurrency(marketCap) },
+              { label: 'Total Supply', value: coin.totalSupply.toLocaleString('en-IN') },
+              { label: 'Base Price',   value: formatCurrency(coin.basePrice) },
+              { label: 'Ticker',       value: coin.ticker },
+            ].map(stat => (
+              <div key={stat.label} className="rounded-2xl p-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+                <p className="text-xs mb-0.5" style={{ color: '#666' }}>{stat.label}</p>
+                <p className="font-bold text-white text-sm">{stat.value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Holdings */}
+          {holding && holding.amount > 0 ? (
+            <div className="rounded-2xl p-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>My Holdings</p>
+              <div className="grid grid-cols-2 gap-y-2.5 text-sm">
+                <span style={{ color: '#888' }}>Amount owned</span>
+                <span className="font-bold text-white text-right">{holding.amount.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {coin.ticker}</span>
+                <span style={{ color: '#888' }}>Avg buy price</span>
+                <span className="font-bold text-white text-right">{formatCurrency(holding.avgBuyPrice)}</span>
+                <span style={{ color: '#888' }}>Current value</span>
+                <span className="font-bold text-white text-right">{formatCurrency(holdingsValue)}</span>
+                <span style={{ color: '#888' }}>Unrealized P&L</span>
+                <span className={`font-bold text-right ${holdingsGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {holdingsGain >= 0 ? '+' : '-'}{formatCurrency(Math.abs(holdingsGain))}<br />
+                  <span className="text-xs font-semibold">({holdingsGainPct.toFixed(2)}%)</span>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl p-4 text-center" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+              <p className="text-sm" style={{ color: '#555' }}>You don't own any {coin.ticker} yet.</p>
+            </div>
+          )}
+
+          {/* Quantity selector */}
+          <div className="rounded-2xl p-4" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+            <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>Quantity</p>
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={() => setQty(q => Math.max(1, q - 1))}
+                className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              >−</button>
+              <input
+                type="number"
+                min={1}
+                value={qty}
+                onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+                className="flex-1 text-center font-bold text-white text-lg rounded-xl py-2 outline-none"
+                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a' }}
+              />
+              <button
+                onClick={() => setQty(q => q + 1)}
+                className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              >+</button>
+              <button
+                onClick={() => { const max = Math.floor(balance / price); setQty(max > 0 ? max : 1); }}
+                className="px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#FF6B00' }}
+              >Max</button>
+            </div>
+            <div className="flex justify-between text-xs" style={{ color: '#666' }}>
+              <span>Total cost</span>
+              <span className="font-bold text-white">{formatCurrency(price * qty)}</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 pb-2">
+            <button
+              onClick={() => { buyCrypto(coinId, qty); if (soundEnabled) playBuy(); }}
+              disabled={balance < price * qty}
+              className="flex-1 py-3 rounded-xl font-bold text-white disabled:opacity-40 active:scale-95 transition-all"
+              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+            >
+              Buy {qty}
+            </button>
+            {holding && holding.amount >= qty && (
+              <button
+                onClick={() => { sellCrypto(coinId, qty); if (soundEnabled) playSell(); }}
+                className="flex-1 py-3 rounded-xl font-bold active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+              >
+                Sell {qty}
+              </button>
+            )}
+            {holding && holding.amount > 0 && (
+              <button
+                onClick={() => { sellCrypto(coinId, holding.amount); if (soundEnabled) playSell(); }}
+                className="px-4 py-3 rounded-xl font-bold active:scale-95 transition-all"
+                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+              >
+                All
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Coin list */}
-      <div className="nm-card p-4">
-        <p className="font-bold text-white mb-4 text-sm">Coins</p>
-        <div className="space-y-5">
-          {CRYPTOS.map(coin => {
-            const price      = cryptoPrices[coin.id];
-            const holding    = cryptoHoldings[coin.id];
-            const changePct  = ((price - coin.basePrice) / coin.basePrice) * 100;
-            const isUp       = changePct >= 0;
+type CryptoSort = 'default' | 'price_asc' | 'price_desc' | 'gain' | 'loss';
 
+function CryptoModal({ onClose }: { onClose: () => void }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [qty, setQty]   = useState(1);
+  const [sort, setSort] = useState<CryptoSort>('default');
+
+  const cryptoHoldings = useGameStore(s => s.cryptoHoldings);
+  const cryptoPrices   = useGameStore(s => s.cryptoPrices);
+  const balance        = useGameStore(s => s.balance);
+  const buyCrypto      = useGameStore(s => s.buyCrypto);
+  const sellCrypto     = useGameStore(s => s.sellCrypto);
+  const soundEnabled   = useGameStore(s => s.soundEnabled);
+
+  const investedCount = CRYPTOS.filter(c => (cryptoHoldings[c.id]?.amount ?? 0) > 0).length;
+
+  return (
+    <>
+    <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
+      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="font-bold text-lg text-white">Crypto Market</h3>
+              <p className="text-xs mt-0.5" style={{ color: '#666' }}>
+                <span style={{ color: '#FF6B00' }}>{investedCount}</span>
+                <span> / {CRYPTOS.length} coins invested</span>
+              </p>
+            </div>
+            <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={onClose}>
+              <X size={18} color="#888" />
+            </button>
+          </div>
+          {/* Quantity selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold shrink-0" style={{ color: '#666' }}>Qty</span>
+            <button
+              onClick={() => setQty(q => Math.max(1, q - 1))}
+              className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
+              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+            >−</button>
+            <input
+              type="number"
+              min={1}
+              value={qty}
+              onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+              className="w-16 text-center font-bold text-white text-sm rounded-lg py-1.5 outline-none"
+              style={{ background: '#161616', border: '1px solid #2a2a2a' }}
+            />
+            <button
+              onClick={() => setQty(q => q + 1)}
+              className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
+              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+            >+</button>
+            {[5, 10, 50].map(n => (
+              <button
+                key={n}
+                onClick={() => setQty(n)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-bold active:scale-95"
+                style={{ background: qty === n ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: NM_OUT, color: qty === n ? '#fff' : '#888' }}
+              >{n}</button>
+            ))}
+          </div>
+          {/* Sort bar */}
+          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1">
+            <span className="text-xs font-semibold shrink-0" style={{ color: '#666' }}>Sort</span>
+            {([
+              { key: 'default',    label: 'Default' },
+              { key: 'price_asc',  label: '↑ Price' },
+              { key: 'price_desc', label: '↓ Price' },
+              { key: 'gain',       label: '📈 Gainers' },
+              { key: 'loss',       label: '📉 Losers' },
+            ] as { key: CryptoSort; label: string }[]).map(opt => (
+              <button
+                key={opt.key}
+                onClick={() => setSort(opt.key)}
+                className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all"
+                style={{
+                  background: sort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
+                  boxShadow: NM_OUT,
+                  color: sort === opt.key ? '#fff' : '#888',
+                }}
+              >{opt.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-y-auto flex-1 min-h-0 p-4 space-y-3">
+          {[...CRYPTOS].sort((a, b) => {
+            const pa = cryptoPrices[a.id], pb = cryptoPrices[b.id];
+            if (sort === 'price_asc')  return pa - pb;
+            if (sort === 'price_desc') return pb - pa;
+            if (sort === 'gain')  return ((pb - b.basePrice) / b.basePrice) - ((pa - a.basePrice) / a.basePrice);
+            if (sort === 'loss')  return ((pa - a.basePrice) / a.basePrice) - ((pb - b.basePrice) / b.basePrice);
+            return 0;
+          }).map(coin => {
+            const price     = cryptoPrices[coin.id];
+            const holding   = cryptoHoldings[coin.id];
+            const changePct = ((price - coin.basePrice) / coin.basePrice) * 100;
+            const isUp      = changePct >= 0;
             return (
-              <div key={coin.id} className="flex items-center gap-3">
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
-                  style={{ background: coin.color, boxShadow: `0 0 14px ${coin.color}55` }}
+              <div key={coin.id} className="nm-card p-4">
+                <button
+                  className="flex items-center gap-3 w-full text-left mb-3"
+                  onClick={() => setSelectedId(coin.id)}
                 >
-                  {coin.ticker.slice(0, 1)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-white text-sm">{coin.name}</p>
-                  <p className="text-xs" style={{ color: '#666' }}>
-                    {holding
-                      ? `${holding.amount.toLocaleString('en-IN', { maximumFractionDigits: 4 })} ${coin.ticker}`
-                      : `0.00 ${coin.ticker}`}
-                  </p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="font-bold text-white text-sm">
-                    {formatCurrency(price * (holding?.amount ?? 1))}
-                  </p>
-                  <p className={`text-xs font-semibold flex items-center justify-end gap-0.5 ${isUp ? 'text-green-500' : 'text-red-500'}`}>
-                    {isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                    {Math.abs(changePct).toFixed(2)}%
-                  </p>
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style={{ background: coin.color, boxShadow: `0 0 12px ${coin.color}55` }}>
+                    {coin.ticker}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-sm">{coin.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs" style={{ color: '#888' }}>{formatCurrency(price)}</p>
+                      <p className={`text-xs font-semibold flex items-center gap-0.5 ${isUp ? 'text-green-500' : 'text-red-500'}`}>
+                        {isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                        {Math.abs(changePct).toFixed(2)}%
+                      </p>
+                    </div>
+                    {holding && holding.amount > 0 && (
+                      <p className="text-xs" style={{ color: '#FF6B00' }}>
+                        {holding.amount.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {coin.ticker} · {formatCurrency(holding.amount * price)}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight size={14} color="#444" />
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { buyCrypto(coin.id, qty); if (soundEnabled) playBuy(); }}
+                    disabled={balance < price * qty}
+                    className="flex-1 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40"
+                    style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+                  >
+                    Buy {qty}
+                  </button>
+                  {holding && holding.amount >= qty && (
+                    <button
+                      onClick={() => { sellCrypto(coin.id, qty); if (soundEnabled) playSell(); }}
+                      className="flex-1 py-2 rounded-xl text-sm font-bold"
+                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+                    >
+                      Sell {qty}
+                    </button>
+                  )}
+                  {holding && holding.amount > 0 && (
+                    <button
+                      onClick={() => { sellCrypto(coin.id, holding.amount); if (soundEnabled) playSell(); }}
+                      className="px-3 py-2 rounded-xl text-sm font-bold"
+                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+                    >
+                      All
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+    </div>
+    {selectedId && <CryptoDetailModal coinId={selectedId} onClose={() => setSelectedId(null)} />}
+    </>
+  );
+}
 
-      {showBuy && (
-        <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-          <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
-              <h3 className="font-bold text-lg text-white">Trade Crypto</h3>
-              <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={() => setShowBuy(false)}>
-                <X size={18} color="#888" />
-              </button>
-            </div>
-            <div className="overflow-y-auto p-4 space-y-3">
-              {CRYPTOS.map(coin => {
-                const price   = cryptoPrices[coin.id];
-                const holding = cryptoHoldings[coin.id];
-                return (
-                  <div key={coin.id} className="nm-card p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shrink-0"
-                        style={{ background: coin.color, boxShadow: `0 0 12px ${coin.color}55` }}>
-                        {coin.ticker.slice(0, 1)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white text-sm">{coin.name}</p>
-                        <p className="text-xs" style={{ color: '#888' }}>{formatCurrency(price)} each</p>
-                        {holding && (
-                          <p className="text-xs" style={{ color: '#FF6B00' }}>
-                            {holding.amount.toLocaleString('en-IN', { maximumFractionDigits: 4 })} {coin.ticker} · {formatCurrency(holding.amount * price)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => { buyCrypto(coin.id, 1); if (soundEnabled) playBuy(); }}
-                        disabled={balance < price}
-                        className="flex-1 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40"
-                        style={{ background: balance >= price ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
-                      >
-                        Buy 1
-                      </button>
-                      {holding && holding.amount >= 1 && (
-                        <button
-                          onClick={() => { sellCrypto(coin.id, 1); if (soundEnabled) playSell(); }}
-                          className="flex-1 py-2 rounded-xl text-sm font-bold"
-                          style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
-                        >
-                          Sell 1
-                        </button>
-                      )}
-                      {holding && holding.amount > 0 && (
-                        <button
-                          onClick={() => { sellCrypto(coin.id, holding.amount); if (soundEnabled) playSell(); }}
-                          className="px-3 py-2 rounded-xl text-sm font-bold"
-                          style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
-                        >
-                          All
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+function CryptoTab() {
+  const [showMarket, setShowMarket] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const cryptoHoldings          = useGameStore(s => s.cryptoHoldings);
+  const cryptoPrices            = useGameStore(s => s.cryptoPrices);
+  const balance                 = useGameStore(s => s.balance);
+  const buyCrypto               = useGameStore(s => s.buyCrypto);
+  const getCryptoPortfolioValue = useGameStore(s => s.getCryptoPortfolioValue);
+  const soundEnabled            = useGameStore(s => s.soundEnabled);
+
+  const totalValue    = getCryptoPortfolioValue();
+  const costBasis     = CRYPTOS.reduce((t, c) => { const h = cryptoHoldings[c.id]; return h ? t + h.amount * h.avgBuyPrice : t; }, 0);
+  const gain          = totalValue - costBasis;
+  const gainPct       = costBasis > 0 ? (gain / costBasis) * 100 : 0;
+  const investedCount = CRYPTOS.filter(c => (cryptoHoldings[c.id]?.amount ?? 0) > 0).length;
+
+  return (
+    <div className="p-4 space-y-4">
+      {/* Portfolio card */}
+      <div className="nm-card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">₿</span>
+            <span className="font-semibold text-white text-sm">My crypto portfolio</span>
+          </div>
+          <ChevronRight size={16} color="#555" />
+        </div>
+        <p className="text-xs" style={{ color: '#888' }}>Portfolio value</p>
+        <p className="text-2xl font-bold text-white mt-0.5">{formatCurrency(totalValue)}</p>
+        {gain !== 0 && (
+          <p className={`text-sm font-semibold mt-1 flex items-center gap-1 ${gain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {gain >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+            {gain >= 0 ? '+' : '-'}{formatCurrency(Math.abs(gain))} ({Math.abs(gainPct).toFixed(2)}%) all time
+          </p>
+        )}
+        <div className="h-px mt-3 mb-3" style={{ background: '#2a2a2a' }} />
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-xs" style={{ color: '#888' }}>Coins invested</p>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-white">{investedCount}</span>
+            <span className="text-xs" style={{ color: '#555' }}>/</span>
+            <span className="text-sm font-bold" style={{ color: '#FF6B00' }}>{CRYPTOS.length}</span>
           </div>
         </div>
-      )}
+        <div className="rounded-full overflow-hidden" style={{ height: 4, background: '#2a2a2a' }}>
+          <div className="h-full rounded-full transition-all"
+            style={{ width: `${(investedCount / CRYPTOS.length) * 100}%`, background: 'linear-gradient(90deg,#FF8C00,#FF5500)' }} />
+        </div>
+      </div>
+
+      {/* Crypto market button */}
+      <button
+        onClick={() => setShowMarket(true)}
+        className="nm-orange w-full rounded-2xl p-4 flex items-center justify-between text-white"
+      >
+        <div className="text-left">
+          <p className="font-bold">Crypto market</p>
+          <p className="text-sm opacity-70">Trade all available coins</p>
+        </div>
+        <ChevronRight size={20} />
+      </button>
+
+      {/* Top movers */}
+      <div className="nm-card p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-base">📊</span>
+          <div>
+            <p className="font-bold text-white text-sm">Top movers</p>
+            <p className="text-xs" style={{ color: '#666' }}>Highest price movement</p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          {[...CRYPTOS].sort((a, b) =>
+            Math.abs((cryptoPrices[b.id] - b.basePrice) / b.basePrice) -
+            Math.abs((cryptoPrices[a.id] - a.basePrice) / a.basePrice)
+          ).slice(0, 3).map(coin => {
+            const price     = cryptoPrices[coin.id];
+            const changePct = ((price - coin.basePrice) / coin.basePrice) * 100;
+            const isUp      = changePct >= 0;
+            return (
+              <div key={coin.id} className="flex items-center justify-between">
+                <button className="flex items-center gap-3 flex-1 text-left" onClick={() => setSelectedId(coin.id)}>
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    style={{ background: coin.color, boxShadow: `0 0 10px ${coin.color}44` }}
+                  >
+                    {coin.ticker.slice(0, 3)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white text-sm">{coin.name}</p>
+                    <p className={`text-xs font-semibold flex items-center gap-0.5 ${isUp ? 'text-green-500' : 'text-red-500'}`}>
+                      {isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                      {isUp ? '+' : ''}{changePct.toFixed(2)}%
+                    </p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { buyCrypto(coin.id, 1); if (soundEnabled) playBuy(); }}
+                  disabled={balance < price}
+                  className="nm-orange text-white px-5 py-2 rounded-xl text-sm font-bold disabled:opacity-40"
+                  style={balance < price ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+                >
+                  Buy
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={() => setShowMarket(true)} className="text-sm font-semibold mt-4" style={{ color: '#FF6B00' }}>
+          Show all →
+        </button>
+      </div>
+
+      {showMarket  && <CryptoModal onClose={() => setShowMarket(false)} />}
+      {selectedId  && <CryptoDetailModal coinId={selectedId} onClose={() => setSelectedId(null)} />}
     </div>
   );
 }

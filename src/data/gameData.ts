@@ -193,12 +193,31 @@ export const PROPERTIES: PropertyDef[] = [
 ];
 
 export const CRYPTOS: CryptoDef[] = [
-  { id: 'bitcoin',  name: 'Bitcoin',   ticker: 'BTC', color: '#F7931A', basePrice: 67_000, totalSupply: 21_000_000       },
-  { id: 'ethereum', name: 'Ethereum',  ticker: 'ETH', color: '#627EEA', basePrice: 3_500,  totalSupply: 120_000_000      },
-  { id: 'cardano',  name: 'Cardano',   ticker: 'ADA', color: '#0033AD', basePrice: 0.48,   totalSupply: 45_000_000_000   },
-  { id: 'xrp',      name: 'XRP',       ticker: 'XRP', color: '#346AA9', basePrice: 0.62,   totalSupply: 100_000_000_000  },
-  { id: 'solana',   name: 'Solana',    ticker: 'SOL', color: '#9945FF', basePrice: 155,    totalSupply: 580_000_000      },
-  { id: 'polkadot', name: 'Polkadot',  ticker: 'DOT', color: '#E6007A', basePrice: 7.2,    totalSupply: 1_400_000_000    },
+  { id: 'bitcoin',   name: 'Bitcoin',          ticker: 'BTC',  color: '#F7931A', basePrice: 67_000,   totalSupply: 21_000_000        },
+  { id: 'ethereum',  name: 'Ethereum',          ticker: 'ETH',  color: '#627EEA', basePrice: 3_500,    totalSupply: 120_000_000       },
+  { id: 'bnb',       name: 'BNB',               ticker: 'BNB',  color: '#F3BA2F', basePrice: 580,      totalSupply: 153_000_000       },
+  { id: 'solana',    name: 'Solana',            ticker: 'SOL',  color: '#9945FF', basePrice: 155,      totalSupply: 580_000_000       },
+  { id: 'xrp',       name: 'XRP',               ticker: 'XRP',  color: '#346AA9', basePrice: 0.62,     totalSupply: 100_000_000_000   },
+  { id: 'dogecoin',  name: 'Dogecoin',          ticker: 'DOGE', color: '#C2A633', basePrice: 0.15,     totalSupply: 144_000_000_000   },
+  { id: 'cardano',   name: 'Cardano',           ticker: 'ADA',  color: '#0033AD', basePrice: 0.48,     totalSupply: 45_000_000_000    },
+  { id: 'avalanche', name: 'Avalanche',         ticker: 'AVAX', color: '#E84142', basePrice: 35,       totalSupply: 720_000_000       },
+  { id: 'tron',      name: 'TRON',              ticker: 'TRX',  color: '#EF0027', basePrice: 0.12,     totalSupply: 87_000_000_000    },
+  { id: 'chainlink', name: 'Chainlink',         ticker: 'LINK', color: '#2A5ADA', basePrice: 15,       totalSupply: 1_000_000_000     },
+  { id: 'polkadot',  name: 'Polkadot',          ticker: 'DOT',  color: '#E6007A', basePrice: 7.2,      totalSupply: 1_400_000_000     },
+  { id: 'polygon',   name: 'Polygon',           ticker: 'POL',  color: '#8247E5', basePrice: 0.55,     totalSupply: 10_000_000_000    },
+  { id: 'litecoin',  name: 'Litecoin',          ticker: 'LTC',  color: '#BFBBBB', basePrice: 80,       totalSupply: 84_000_000        },
+  { id: 'shiba',     name: 'Shiba Inu',         ticker: 'SHIB', color: '#FFA409', basePrice: 0.000025, totalSupply: 589_000_000_000_000 },
+  { id: 'uniswap',   name: 'Uniswap',           ticker: 'UNI',  color: '#FF007A', basePrice: 8,        totalSupply: 1_000_000_000     },
+  { id: 'cosmos',    name: 'Cosmos',            ticker: 'ATOM', color: '#6F4CFF', basePrice: 8,        totalSupply: 390_000_000       },
+  { id: 'near',      name: 'NEAR Protocol',     ticker: 'NEAR', color: '#00C08B', basePrice: 5,        totalSupply: 1_000_000_000     },
+  { id: 'monero',    name: 'Monero',            ticker: 'XMR',  color: '#FF6600', basePrice: 165,      totalSupply: 18_400_000        },
+  { id: 'stellar',   name: 'Stellar',           ticker: 'XLM',  color: '#7AC0E4', basePrice: 0.11,     totalSupply: 50_000_000_000    },
+  { id: 'aptos',     name: 'Aptos',             ticker: 'APT',  color: '#00C2CB', basePrice: 9,        totalSupply: 1_100_000_000     },
+  { id: 'arbitrum',  name: 'Arbitrum',          ticker: 'ARB',  color: '#28A0F0', basePrice: 0.90,     totalSupply: 10_000_000_000    },
+  { id: 'optimism',  name: 'Optimism',          ticker: 'OP',   color: '#FF0420', basePrice: 1.75,     totalSupply: 4_300_000_000     },
+  { id: 'vechain',   name: 'VeChain',           ticker: 'VET',  color: '#15BDFF', basePrice: 0.04,     totalSupply: 86_700_000_000    },
+  { id: 'filecoin',  name: 'Filecoin',          ticker: 'FIL',  color: '#0090FF', basePrice: 5,        totalSupply: 2_000_000_000     },
+  { id: 'icp',       name: 'Internet Computer', ticker: 'ICP',  color: '#3B00B9', basePrice: 13,       totalSupply: 500_000_000       },
 ];
 
 export const CARS: VehicleDef[] = [
@@ -253,12 +272,12 @@ export const PAINTING_COLLECTION: CollectionItemDef[] = Array.from({ length: 25 
 }));
 
 export const CLICK_UPGRADES: ClickUpgradeDef[] = [
-  { id: 'better_technique', name: 'Better Technique', description: '2× click value',   multiplier: 2,   cost: 1_000           },
-  { id: 'gold_touch',       name: 'Gold Touch',       description: '5× click value',   multiplier: 5,   cost: 10_000          },
-  { id: 'silver_strike',    name: 'Silver Strike',    description: '10× click value',  multiplier: 10,  cost: 100_000         },
-  { id: 'diamond_finger',   name: 'Diamond Finger',   description: '25× click value',  multiplier: 25,  cost: 1_000_000       },
-  { id: 'platinum_press',   name: 'Platinum Press',   description: '50× click value',  multiplier: 50,  cost: 10_000_000      },
-  { id: 'titanium_tap',     name: 'Titanium Tap',     description: '100× click value', multiplier: 100, cost: 100_000_000     },
-  { id: 'quantum_click',    name: 'Quantum Click',    description: '250× click value', multiplier: 250, cost: 1_000_000_000   },
-  { id: 'cosmic_touch',     name: 'Cosmic Touch',     description: '500× click value', multiplier: 500, cost: 10_000_000_000  },
+  { id: 'better_technique', name: 'Better Technique', description: '₹5 per click',     clickValue: 5,    cost: 500             },
+  { id: 'gold_touch',       name: 'Gold Touch',       description: '₹25 per click',    clickValue: 25,   cost: 5_000           },
+  { id: 'silver_strike',    name: 'Silver Strike',    description: '₹100 per click',   clickValue: 100,  cost: 25_000          },
+  { id: 'diamond_finger',   name: 'Diamond Finger',   description: '₹250 per click',   clickValue: 250,  cost: 100_000         },
+  { id: 'platinum_press',   name: 'Platinum Press',   description: '₹500 per click',   clickValue: 500,  cost: 500_000         },
+  { id: 'titanium_tap',     name: 'Titanium Tap',     description: '₹1,000 per click', clickValue: 1000, cost: 2_000_000       },
+  { id: 'quantum_click',    name: 'Quantum Click',    description: '₹2,500 per click', clickValue: 2500, cost: 10_000_000      },
+  { id: 'cosmic_touch',     name: 'Cosmic Touch',     description: '₹5,000 per click', clickValue: 5000, cost: 50_000_000      },
 ];

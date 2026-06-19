@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { LogOut, Send, MessageSquare, KeyRound, ShieldCheck, Clock } from 'lucide-react';
+import { LogOut, Send, MessageSquare, KeyRound, ShieldCheck, Clock, RotateCcw } from 'lucide-react';
 import { playTax } from '../utils/sounds';
 import { useGameStore } from '../store/gameStore';
 import { formatCurrency } from '../utils/format';
@@ -55,12 +55,14 @@ export function ProfilePage() {
   const soundEnabled       = useGameStore(s => s.soundEnabled);
   const user               = useGameStore(s => s.user);
   const logout             = useGameStore(s => s.logout);
+  const resetGame          = useGameStore(s => s.resetGame);
   const submitFeedback     = useGameStore(s => s.submitFeedback);
   const updateUser         = useGameStore(s => s.updateUser);
   const feedbackList       = useGameStore(s => s.feedbackList);
 
   const [slots, setSlots]       = useState<(SlotMeta | null)[]>(() => [1, 2, 3].map(readSlotMeta));
   const [confirmLoad, setConfirmLoad] = useState<number | null>(null);
+  const [confirmRestart, setConfirmRestart] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
 
@@ -239,6 +241,57 @@ export function ProfilePage() {
             );
           })}
         </div>
+
+        {/* Restart Game button */}
+        <button
+          onClick={() => setConfirmRestart(true)}
+          className="w-full py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 mb-5 active:scale-95 transition-all"
+          style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff4444', border: '1px solid rgba(255,68,68,0.2)' }}
+        >
+          <RotateCcw size={15} />
+          Restart Game
+        </button>
+
+        {/* Restart confirmation modal */}
+        {confirmRestart && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: 'rgba(0,0,0,0.9)' }}>
+            <div className="w-full rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: '0 0 30px rgba(255,68,68,0.25), 6px 6px 14px #0d0d0d' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,68,68,0.12)' }}>
+                  <RotateCcw size={20} style={{ color: '#ff4444' }} />
+                </div>
+                <p className="font-bold text-white text-lg">Restart Game?</p>
+              </div>
+              <p className="text-sm mb-1" style={{ color: '#aaa' }}>
+                This will permanently wipe all your progress:
+              </p>
+              <ul className="text-xs mb-5 space-y-0.5 pl-3" style={{ color: '#666' }}>
+                <li>• Balance, businesses, stocks, crypto</li>
+                <li>• Properties, vehicles, collections</li>
+                <li>• Tax history &amp; upgrades</li>
+              </ul>
+              <p className="text-xs mb-5 font-semibold" style={{ color: '#ff6666' }}>
+                Your account and save slots are kept. This cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmRestart(false)}
+                  className="flex-1 py-3 rounded-xl font-bold text-sm"
+                  style={{ background: '#1a1a1a', boxShadow: NM_OUT, color: '#888' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { resetGame(); setConfirmRestart(false); }}
+                  className="flex-1 py-3 rounded-xl font-bold text-sm text-white"
+                  style={{ background: 'linear-gradient(135deg,#8B0000,#ff4444)', boxShadow: '0 4px 14px rgba(255,68,68,0.35)' }}
+                >
+                  Restart
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Load confirmation modal */}
         {confirmLoad !== null && (

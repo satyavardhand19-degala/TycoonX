@@ -67,6 +67,7 @@ interface GameState {
   loadSlot: (slot: number) => void;
   applyOfflineEarnings: (seconds: number) => number;
   toggleSound: () => void;
+  resetGame: () => void;
 
   login: (username: string, role: UserRole, password?: string) => string | null;
   register: (username: string, password: string) => string | null;
@@ -320,6 +321,25 @@ export const useGameStore = create<GameState>()(
 
       toggleSound: () => set(state => { state.soundEnabled = !state.soundEnabled; }),
 
+      resetGame: () => set(state => {
+        state.balance = 0;
+        state.ownedBusinesses = {};
+        state.stockHoldings = {};
+        state.propertyHoldings = [];
+        state.propertyLevels = {};
+        state.cryptoHoldings = {};
+        state.ownedCars = [];
+        state.ownedPlanes = [];
+        state.ownedYachts = [];
+        state.residenceLevel = 0;
+        state.coinCollection = Array(20).fill(false);
+        state.paintingCollection = Array(25).fill(false);
+        state.purchasedUpgrades = [];
+        state.taxDue = 0;
+        state.totalTaxPaid = 0;
+        state.lastSeenAt = Date.now();
+      }),
+
       login: (username, role, password) => {
         let error = null;
         set(state => {
@@ -475,9 +495,9 @@ export const useGameStore = create<GameState>()(
 
       getPerClick: () => {
         const { purchasedUpgrades } = get();
-        return CLICK_UPGRADES
-          .filter(u => purchasedUpgrades.includes(u.id))
-          .reduce((acc, u) => acc * u.multiplier, 1);
+        const owned = CLICK_UPGRADES.filter(u => purchasedUpgrades.includes(u.id));
+        if (owned.length === 0) return 1;
+        return Math.max(...owned.map(u => u.clickValue));
       },
 
       getBusinessIncomePerHour: () => {
@@ -583,7 +603,7 @@ export const useGameStore = create<GameState>()(
     })),
     {
       name: 'tycoonx-save',
-      version: 5,
+      version: 7,
       migrate: (old: unknown, _v: number) => {
         const s = (old ?? {}) as Record<string, unknown>;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars

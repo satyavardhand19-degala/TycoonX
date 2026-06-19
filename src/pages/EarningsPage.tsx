@@ -159,7 +159,7 @@ export function EarningsPage() {
           className="rounded-xl px-5 py-3 inline-flex items-center gap-2"
           style={{ background: '#161616', boxShadow: 'inset 4px 4px 8px #0d0d0d, inset -3px -3px 6px #252525' }}
         >
-          <span className="font-bold text-white">{formatCurrency(perClick)}</span>
+          <span className="font-bold text-white">₹ {perClick.toLocaleString('en-IN')}</span>
           <span className="text-sm" style={{ color: '#888' }}>per click</span>
         </div>
       </div>
@@ -215,7 +215,7 @@ export function EarningsPage() {
                 zIndex: 20,
               } as React.CSSProperties}
             >
-              +{formatCurrency(perClick)}
+              +₹ {perClick.toLocaleString('en-IN')}
             </div>
           ))}
         </div>
