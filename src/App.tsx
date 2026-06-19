@@ -27,14 +27,14 @@ function formatDuration(seconds: number): string {
 function OfflineModal({ earned, seconds, onCollect }: { earned: number; seconds: number; onCollect: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: 'rgba(0,0,0,0.88)' }}>
-      <div className="w-full rounded-3xl p-6 text-center" style={{ background: '#1e1e1e', boxShadow: '0 0 40px rgba(255,107,0,0.25), 6px 6px 20px #0a0a0a' }}>
+      <div className="w-full rounded-3xl p-6 text-center" style={{ background: 'var(--bg-card)', boxShadow: '0 0 40px rgba(255,107,0,0.25), 6px 6px 20px #0a0a0a' }}>
         <div className="text-5xl mb-4">💤</div>
         <p className="text-lg font-bold text-white mb-1">Welcome back!</p>
         <p className="text-sm mb-5" style={{ color: '#888' }}>
           You were away for <span style={{ color: '#FF6B00' }}>{formatDuration(seconds)}</span>
         </p>
 
-        <div className="rounded-2xl py-4 px-5 mb-5" style={{ background: '#161616', boxShadow: 'inset 3px 3px 8px #0d0d0d' }}>
+        <div className="rounded-2xl py-4 px-5 mb-5" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 3px 3px 8px #0d0d0d' }}>
           <p className="text-xs uppercase tracking-widest mb-1" style={{ color: '#555' }}>Earned while away</p>
           <p className="text-3xl font-bold" style={{ color: '#FF6B00', textShadow: '0 0 20px rgba(255,107,0,0.5)' }}>
             {formatCurrency(earned)}
@@ -57,8 +57,13 @@ function OfflineModal({ earned, seconds, onCollect }: { earned: number; seconds:
 }
 
 function GameApp() {
-  const user = useGameStore(s => s.user);
+  const user  = useGameStore(s => s.user);
+  const theme = useGameStore(s => s.theme);
   usePassiveIncome();
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme ?? 'dark';
+  }, [theme]);
 
   const lastSeenAt          = useGameStore(s => s.lastSeenAt);
   const applyOfflineEarnings = useGameStore(s => s.applyOfflineEarnings);
@@ -91,7 +96,7 @@ function GameApp() {
   }
 
   return (
-    <div className={`${user.role === 'user' ? 'pb-20' : ''} min-h-screen`} style={{ background: '#1a1a1a' }}>
+    <div className={`${user.role === 'user' ? 'pb-20' : ''} min-h-screen`} style={{ background: 'var(--bg-base)' }}>
       <Routes>
         {user.role === 'admin' ? (
           <>

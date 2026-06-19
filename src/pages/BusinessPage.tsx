@@ -47,12 +47,12 @@ function MergerModal({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
-  const NM = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
+  const NM = 'var(--nm-out)';
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <div>
             <h3 className="font-bold text-lg text-white">Business Mergers</h3>
             <p className="text-xs" style={{ color: '#666' }}>Select 2 businesses — the stronger absorbs the weaker</p>
@@ -79,7 +79,7 @@ function MergerModal({ onClose }: { onClose: () => void }) {
                 onClick={() => !disabled && toggle(b.id)}
                 className="w-full flex items-center gap-3 p-4 rounded-2xl text-left transition-all"
                 style={{
-                  background: isSelected ? '#2a1a00' : '#1e1e1e',
+                  background: isSelected ? '#2a1a00' : 'var(--bg-card)',
                   boxShadow: isSelected ? '0 0 14px rgba(255,107,0,0.4), inset 0 0 0 2px #FF6B00' : NM,
                   opacity: disabled ? 0.4 : 1,
                 }}
@@ -106,7 +106,7 @@ function MergerModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {canMerge && (
-          <div className="px-4 pb-2 pt-3" style={{ borderTop: '1px solid #2a2a2a' }}>
+          <div className="px-4 pb-2 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
             {atMax ? (
               <p className="text-center text-sm py-2" style={{ color: '#ff5555' }}>
                 {survivorDef?.name} has reached max merges (3/3)
@@ -158,7 +158,7 @@ export function BusinessPage() {
   const ownedCount  = Object.keys(ownedBusinesses).length;
 
   return (
-    <div className="min-h-screen pb-6" style={{ background: '#1a1a1a' }}>
+    <div className="min-h-screen pb-6" style={{ background: 'var(--bg-base)' }}>
       {/* Header */}
       <div className="px-5 pt-12 pb-5 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Business</h1>
@@ -232,7 +232,7 @@ export function BusinessPage() {
                 {/* Emoji icon */}
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                  style={{ background: '#161616', boxShadow: 'inset 3px 3px 7px #0d0d0d, inset -2px -2px 5px #252525' }}
+                  style={{ background: 'var(--bg-deep)', boxShadow: 'inset 3px 3px 7px #0d0d0d, inset -2px -2px 5px #252525' }}
                 >
                   {b.emoji}
                 </div>
@@ -272,7 +272,7 @@ export function BusinessPage() {
                   style={
                     canUpgrade
                       ? { background: 'linear-gradient(135deg, #FF8C00, #FF5500)', boxShadow: '3px 3px 8px rgba(255,107,0,0.4)' }
-                      : { background: '#1e1e1e', boxShadow: 'inset 2px 2px 5px #0d0d0d, inset -1px -1px 3px #252525' }
+                      : { background: 'var(--bg-card)', boxShadow: 'inset 2px 2px 5px #0d0d0d, inset -1px -1px 3px #252525' }
                   }
                 >
                   <ChevronUp size={16} color={canUpgrade ? '#fff' : '#444'} />
@@ -290,9 +290,9 @@ export function BusinessPage() {
         <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.75)' }}>
           <div
             className="w-full max-h-[82vh] flex flex-col rounded-t-3xl"
-            style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}
+            style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}
           >
-            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
               <h3 className="font-bold text-lg text-white">Start a Business</h3>
               <button
                 onClick={() => setShowShop(false)}

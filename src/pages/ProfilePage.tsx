@@ -28,7 +28,7 @@ function timeAgo(ts: number): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-const NM_OUT = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
+const NM_OUT = 'var(--nm-out)';
 
 export function ProfilePage() {
   const balance            = useGameStore(s => s.balance);
@@ -155,7 +155,7 @@ export function ProfilePage() {
   const visible = categories.filter(c => c.value > 0);
 
   return (
-    <div className="min-h-screen pb-6" style={{ background: '#1a1a1a' }}>
+    <div className="min-h-screen pb-6" style={{ background: 'var(--bg-base)' }}>
       <div className="px-4 pt-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -170,7 +170,7 @@ export function ProfilePage() {
           <button
             onClick={() => logout()}
             className="nm-btn flex items-center gap-2 rounded-xl px-4 py-2 text-red-400 font-bold text-sm"
-            style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+            style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
           >
             <LogOut size={16} />
             Logout
@@ -196,7 +196,7 @@ export function ProfilePage() {
               <div
                 key={n}
                 className="rounded-2xl p-4 flex items-center gap-3"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
               >
                 <span className="text-2xl shrink-0">{SLOT_ICONS[i]}</span>
                 <div className="flex-1 min-w-0">
@@ -223,14 +223,14 @@ export function ProfilePage() {
                       <button
                         onClick={() => setConfirmLoad(n)}
                         className="px-3 py-1.5 rounded-xl text-xs font-bold"
-                        style={{ background: '#1a1a1a', boxShadow: NM_OUT, color: '#4CAF50' }}
+                        style={{ background: 'var(--bg-base)', boxShadow: NM_OUT, color: '#4CAF50' }}
                       >
                         Load
                       </button>
                       <button
                         onClick={() => handleDelete(n)}
                         className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold"
-                        style={{ background: '#1a1a1a', boxShadow: NM_OUT, color: '#555' }}
+                        style={{ background: 'var(--bg-base)', boxShadow: NM_OUT, color: '#555' }}
                       >
                         ✕
                       </button>
@@ -246,7 +246,7 @@ export function ProfilePage() {
         <button
           onClick={() => setConfirmRestart(true)}
           className="w-full py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 mb-5 active:scale-95 transition-all"
-          style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff4444', border: '1px solid rgba(255,68,68,0.2)' }}
+          style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#ff4444', border: '1px solid rgba(255,68,68,0.2)' }}
         >
           <RotateCcw size={15} />
           Restart Game
@@ -255,7 +255,7 @@ export function ProfilePage() {
         {/* Restart confirmation modal */}
         {confirmRestart && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: 'rgba(0,0,0,0.9)' }}>
-            <div className="w-full rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: '0 0 30px rgba(255,68,68,0.25), 6px 6px 14px #0d0d0d' }}>
+            <div className="w-full rounded-3xl p-6" style={{ background: 'var(--bg-card)', boxShadow: '0 0 30px rgba(255,68,68,0.25), 6px 6px 14px #0d0d0d' }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,68,68,0.12)' }}>
                   <RotateCcw size={20} style={{ color: '#ff4444' }} />
@@ -277,7 +277,7 @@ export function ProfilePage() {
                 <button
                   onClick={() => setConfirmRestart(false)}
                   className="flex-1 py-3 rounded-xl font-bold text-sm"
-                  style={{ background: '#1a1a1a', boxShadow: NM_OUT, color: '#888' }}
+                  style={{ background: 'var(--bg-base)', boxShadow: NM_OUT, color: '#888' }}
                 >
                   Cancel
                 </button>
@@ -296,14 +296,14 @@ export function ProfilePage() {
         {/* Load confirmation modal */}
         {confirmLoad !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: 'rgba(0,0,0,0.85)' }}>
-            <div className="w-full rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+            <div className="w-full rounded-3xl p-6" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
               <p className="font-bold text-white text-lg mb-1">Load Slot {confirmLoad}?</p>
               <p className="text-sm mb-5" style={{ color: '#888' }}>This will replace your current progress with the saved data.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setConfirmLoad(null)}
                   className="flex-1 py-3 rounded-xl font-bold text-sm"
-                  style={{ background: '#1a1a1a', boxShadow: NM_OUT, color: '#888' }}
+                  style={{ background: 'var(--bg-base)', boxShadow: NM_OUT, color: '#888' }}
                 >
                   Cancel
                 </button>
@@ -321,7 +321,7 @@ export function ProfilePage() {
 
         {/* Fortune bar */}
         {visible.length > 0 && (
-          <div className="rounded-full overflow-hidden h-3 mb-6 flex gap-0.5" style={{ background: '#161616', boxShadow: 'inset 3px 3px 6px #0d0d0d' }}>
+          <div className="rounded-full overflow-hidden h-3 mb-6 flex gap-0.5" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 3px 3px 6px #0d0d0d' }}>
             {visible.map(c => (
               <div
                 key={c.label}
@@ -355,7 +355,7 @@ export function ProfilePage() {
         <div
           className="rounded-2xl p-5 mb-4"
           style={{
-            background: '#1e1e1e',
+            background: 'var(--bg-card)',
             boxShadow: taxOverdue
               ? '0 0 20px rgba(255,60,60,0.45), 4px 4px 14px #0d0d0d'
               : taxWarning
@@ -381,7 +381,7 @@ export function ProfilePage() {
           {/* Tax due amount */}
           <div
             className="rounded-xl p-3 mb-3 flex items-center justify-between"
-            style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}
+            style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}
           >
             <div>
               <p className="text-xs mb-0.5" style={{ color: '#888' }}>Tax due</p>
@@ -469,7 +469,7 @@ export function ProfilePage() {
 
         {/* Change Password */}
         {user && user.role !== 'admin' && (
-          <div className="rounded-2xl p-6 mb-4 mt-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+          <div className="rounded-2xl p-6 mb-4 mt-4" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
             <div className="flex items-center gap-2 mb-4">
               <KeyRound className="w-5 h-5" style={{ color: '#FF6B00' }} />
               <h2 className="text-xl font-bold text-white">Change Password</h2>
@@ -486,7 +486,7 @@ export function ProfilePage() {
                   value={currentPw}
                   onChange={e => setCurrentPw(e.target.value)}
                   className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
-                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
                   required
                 />
                 <input
@@ -495,7 +495,7 @@ export function ProfilePage() {
                   value={newPw}
                   onChange={e => setNewPw(e.target.value)}
                   className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
-                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
                   required
                 />
                 <input
@@ -504,7 +504,7 @@ export function ProfilePage() {
                   value={confirmPw}
                   onChange={e => setConfirmPw(e.target.value)}
                   className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none"
-                  style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
+                  style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d', border: 'none' }}
                   required
                 />
                 {pwError && (
@@ -525,7 +525,7 @@ export function ProfilePage() {
         {/* Feedback Section */}
         <div
           className="rounded-2xl p-6 mb-4 mt-8"
-          style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+          style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
         >
           <div className="flex items-center gap-2 mb-4">
             <MessageSquare className="w-5 h-5 text-emerald-400" />
@@ -564,8 +564,8 @@ export function ProfilePage() {
           const myFeedback = feedbackList.filter(f => f.userId === user.id);
           if (myFeedback.length === 0) return null;
           return (
-            <div className="rounded-2xl mb-6 overflow-hidden" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
-              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+            <div className="rounded-2xl mb-6 overflow-hidden" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
+              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" style={{ color: '#4ade80' }} />
                   <h2 className="text-lg font-bold text-white">My Support Messages</h2>
@@ -589,7 +589,7 @@ export function ProfilePage() {
                         </span>
                       )}
                     </div>
-                    <div className="rounded-xl p-3 mb-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+                    <div className="rounded-xl p-3 mb-3" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
                       <p className="text-sm text-white leading-relaxed">{fb.message}</p>
                     </div>
 

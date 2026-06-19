@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 
-const NM_OUT  = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
-const NM_IN   = 'inset 2px 2px 6px #0d0d0d, inset -2px -2px 6px #272727';
+const NM_OUT = 'var(--nm-out)';
+const NM_IN  = 'var(--nm-in-sm)';
 
 export const AuthPage: React.FC = () => {
   const [mode, setMode]                   = useState<'login' | 'register'>('login');
@@ -37,7 +37,7 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-10 overflow-hidden" style={{ background: '#1a1a1a' }}>
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-10 overflow-hidden" style={{ background: 'var(--bg-base)' }}>
 
       {/* Decorative background glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full opacity-10 pointer-events-none"
@@ -59,10 +59,10 @@ export const AuthPage: React.FC = () => {
         </div>
 
         {/* Card */}
-        <div className="rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+        <div className="rounded-3xl p-6" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
 
           {/* Tab switcher */}
-          <div className="flex rounded-2xl p-1 mb-6" style={{ background: '#161616', boxShadow: NM_IN }}>
+          <div className="flex rounded-2xl p-1 mb-6" style={{ background: 'var(--bg-deep)', boxShadow: NM_IN }}>
             {(['login', 'register'] as const).map(tab => (
               <button
                 key={tab}
@@ -108,7 +108,7 @@ export const AuthPage: React.FC = () => {
                 onChange={e => setUsername(e.target.value)}
                 placeholder="Enter username..."
                 className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
-                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                style={{ background: 'var(--bg-deep)', boxShadow: NM_IN, border: 'none' }}
                 onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
                 onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
@@ -126,7 +126,7 @@ export const AuthPage: React.FC = () => {
                 onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
-                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                style={{ background: 'var(--bg-deep)', boxShadow: NM_IN, border: 'none' }}
                 onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
                 onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
@@ -145,7 +145,7 @@ export const AuthPage: React.FC = () => {
                   onChange={e => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
-                  style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                  style={{ background: 'var(--bg-deep)', boxShadow: NM_IN, border: 'none' }}
                   onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
                   onBlur={e => (e.target.style.boxShadow = NM_IN)}
                   required

@@ -2,10 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme tokens ── */
+:root, [data-theme="dark"] {
+  --bg-base:   #1a1a1a;
+  --bg-card:   #1e1e1e;
+  --bg-deep:   #161616;
+  --bg-sunken: #141414;
+  --text-primary:   #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --text-dim:   #555555;
+  --text-faint: #444444;
+  --border-subtle: #2a2a2a;
+  --nm-out:  6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b;
+  --nm-in:   inset 5px 5px 11px #0d0d0d, inset -4px -4px 9px #272727;
+  --nm-in-sm: inset 2px 2px 6px #0d0d0d, inset -2px -2px 6px #272727;
+  --nm-btn:  4px 4px 9px #0d0d0d, -3px -3px 7px #2b2b2b;
+  --nm-btn-active: inset 3px 3px 7px #0d0d0d, inset -2px -2px 5px #272727;
+  --nm-card: 7px 7px 16px #0d0d0d, -5px -5px 13px #2d2d2d;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-base:   #f0f0f3;
+  --bg-card:   #e8e8ec;
+  --bg-deep:   #ffffff;
+  --bg-sunken: #f5f5f8;
+  --text-primary:   #1a1a1a;
+  --text-secondary: #333333;
+  --text-muted: #666666;
+  --text-dim:   #999999;
+  --text-faint: #bbbbbb;
+  --border-subtle: #d0d0d3;
+  --nm-out:  6px 6px 14px #c8c8cb, -5px -5px 12px #ffffff;
+  --nm-in:   inset 5px 5px 11px #c8c8cb, inset -4px -4px 9px #ffffff;
+  --nm-in-sm: inset 2px 2px 6px #c8c8cb, inset -2px -2px 6px #ffffff;
+  --nm-btn:  4px 4px 9px #c8c8cb, -3px -3px 7px #ffffff;
+  --nm-btn-active: inset 3px 3px 7px #c8c8cb, inset -2px -2px 5px #ffffff;
+  --nm-card: 7px 7px 16px #c8c8cb, -5px -5px 13px #ffffff;
+  color-scheme: light;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 400;
-  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -13,29 +53,32 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #1a1a1a;
+  background-color: var(--bg-base);
 }
 
-/* ── Neumorphism dark theme ── */
+/* text-white flips to dark in light mode */
+[data-theme="light"] .text-white { color: var(--text-primary) !important; }
+
+/* ── Neumorphism classes ── */
 .nm-out {
-  background: #1e1e1e;
-  box-shadow: 6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b;
+  background: var(--bg-card);
+  box-shadow: var(--nm-out);
 }
 
 .nm-in {
-  background: #161616;
-  box-shadow: inset 5px 5px 11px #0d0d0d, inset -4px -4px 9px #272727;
+  background: var(--bg-deep);
+  box-shadow: var(--nm-in);
 }
 
 .nm-btn {
-  background: #1e1e1e;
-  box-shadow: 4px 4px 9px #0d0d0d, -3px -3px 7px #2b2b2b;
+  background: var(--bg-card);
+  box-shadow: var(--nm-btn);
   transition: box-shadow 0.12s ease, transform 0.1s ease;
   cursor: pointer;
   user-select: none;
 }
 .nm-btn:active {
-  box-shadow: inset 3px 3px 7px #0d0d0d, inset -2px -2px 5px #272727;
+  box-shadow: var(--nm-btn-active);
   transform: scale(0.97);
 }
 
@@ -51,8 +94,8 @@ body {
 }
 
 .nm-card {
-  background: #1e1e1e;
-  box-shadow: 7px 7px 16px #0d0d0d, -5px -5px 13px #2d2d2d;
+  background: var(--bg-card);
+  box-shadow: var(--nm-card);
   border-radius: 20px;
 }
 

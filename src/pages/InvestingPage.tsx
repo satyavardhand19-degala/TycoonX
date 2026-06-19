@@ -16,8 +16,8 @@ import { playBuy, playSell } from '../utils/sounds';
 
 type InvestTab = 'shares' | 'realestate' | 'crypto';
 
-const NM_OUT = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
-const NM_IN  = 'inset 5px 5px 11px #0d0d0d, inset -4px -4px 9px #272727';
+const NM_OUT = 'var(--nm-out)';
+const NM_IN  = 'var(--nm-in)';
 
 function SharesTab() {
   const [showMarket,  setShowMarket]  = useState(false);
@@ -136,7 +136,7 @@ function SharesTab() {
                 onClick={() => buyStock(s.id, 1)}
                 disabled={balance < stockPrices[s.id]}
                 className="nm-orange text-white px-5 py-2 rounded-xl text-sm font-bold disabled:opacity-40"
-                style={balance < stockPrices[s.id] ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+                style={balance < stockPrices[s.id] ? { background: 'var(--bg-card)', boxShadow: NM_OUT } : undefined}
               >
                 Buy
               </button>
@@ -179,9 +179,9 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.88)' }}>
-      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <div
             className="w-13 h-13 w-12 h-12 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
             style={{ background: stock.color, boxShadow: `0 0 18px ${stock.color}66` }}
@@ -215,7 +215,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
               { label: 'Dividend / hr',   value: `${formatCurrency(divPerShare)} / share` },
               { label: 'Base Price',      value: `Rs. ${Math.round(stock.basePrice).toLocaleString('en-IN')}` },
             ].map(stat => (
-              <div key={stat.label} className="rounded-2xl p-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+              <div key={stat.label} className="rounded-2xl p-3" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
                 <p className="text-xs mb-0.5" style={{ color: '#666' }}>{stat.label}</p>
                 <p className="font-bold text-white text-sm">{stat.value}</p>
               </div>
@@ -224,7 +224,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
 
           {/* Holdings */}
           {holding ? (
-            <div className="rounded-2xl p-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs uppercase tracking-widest" style={{ color: '#555' }}>My Holdings</p>
                 {holding.shares >= STOCK_TOTAL_SHARES && (
@@ -262,19 +262,19 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl p-4 text-center" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+            <div className="rounded-2xl p-4 text-center" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
               <p className="text-sm" style={{ color: '#555' }}>You don't own any shares yet.</p>
             </div>
           )}
 
           {/* Quantity selector */}
-          <div className="rounded-2xl p-4" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+          <div className="rounded-2xl p-4" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
             <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>Quantity</p>
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setQty(q => Math.max(1, q - 1))}
                 className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
               >−</button>
               <input
                 type="number"
@@ -282,12 +282,12 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
                 value={qty}
                 onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
                 className="flex-1 text-center font-bold text-white text-lg rounded-xl py-2 outline-none"
-                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a' }}
+                style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}
               />
               <button
                 onClick={() => setQty(q => q + 1)}
                 className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
               >+</button>
               <button
                 onClick={() => {
@@ -295,7 +295,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
                   setQty(max > 0 ? max : 1);
                 }}
                 className="px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#FF6B00' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#FF6B00' }}
               >Max</button>
             </div>
             <div className="flex justify-between text-xs" style={{ color: '#666' }}>
@@ -310,7 +310,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
               onClick={() => { buyStock(stockId, qty); if (soundEnabled) playBuy(); }}
               disabled={balance < price * qty}
               className="flex-1 py-3 rounded-xl font-bold text-white disabled:opacity-40 active:scale-95 transition-all"
-              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
             >
               Buy {qty}
             </button>
@@ -318,7 +318,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
               <button
                 onClick={() => { sellStock(stockId, qty); if (soundEnabled) playSell(); }}
                 className="flex-1 py-3 rounded-xl font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#4CAF50' }}
               >
                 Sell {qty}
               </button>
@@ -327,7 +327,7 @@ function StockDetailModal({ stockId, onClose }: { stockId: string; onClose: () =
               <button
                 onClick={() => { sellStock(stockId, holding.shares); if (soundEnabled) playSell(); }}
                 className="px-4 py-3 rounded-xl font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#ff5555' }}
               >
                 All
               </button>
@@ -356,8 +356,8 @@ function StockModal({ onClose }: { onClose: () => void }) {
   return (
     <>
     <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-        <div className="px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <div className="flex items-center justify-between mb-3">
             <div>
               <h3 className="font-bold text-lg text-white">Stock Market</h3>
@@ -377,7 +377,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
             <button
               onClick={() => setQty(q => Math.max(1, q - 1))}
               className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
-              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
             >−</button>
             <input
               type="number"
@@ -385,19 +385,19 @@ function StockModal({ onClose }: { onClose: () => void }) {
               value={qty}
               onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
               className="w-16 text-center font-bold text-white text-sm rounded-lg py-1.5 outline-none"
-              style={{ background: '#161616', border: '1px solid #2a2a2a' }}
+              style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-subtle)' }}
             />
             <button
               onClick={() => setQty(q => q + 1)}
               className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
-              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
             >+</button>
             {[5, 10, 50].map(n => (
               <button
                 key={n}
                 onClick={() => setQty(n)}
                 className="px-2.5 py-1.5 rounded-lg text-xs font-bold active:scale-95"
-                style={{ background: qty === n ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: NM_OUT, color: qty === n ? '#fff' : '#888' }}
+                style={{ background: qty === n ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: NM_OUT, color: qty === n ? '#fff' : '#888' }}
               >{n}</button>
             ))}
           </div>
@@ -416,7 +416,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
                 onClick={() => setSort(opt.key)}
                 className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all"
                 style={{
-                  background: sort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
+                  background: sort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)',
                   boxShadow: NM_OUT,
                   color: sort === opt.key ? '#fff' : '#888',
                 }}
@@ -471,7 +471,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
                     onClick={() => { buyStock(s.id, qty); if (soundEnabled) playBuy(); }}
                     disabled={balance < price * qty}
                     className="flex-1 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40"
-                    style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+                    style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
                   >
                     Buy {qty}
                   </button>
@@ -479,7 +479,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => { sellStock(s.id, qty); if (soundEnabled) playSell(); }}
                       className="flex-1 py-2 rounded-xl text-sm font-bold"
-                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+                      style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#4CAF50' }}
                     >
                       Sell {qty}
                     </button>
@@ -488,7 +488,7 @@ function StockModal({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => { sellStock(s.id, holding.shares); if (soundEnabled) playSell(); }}
                       className="px-3 py-2 rounded-xl text-sm font-bold"
-                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+                      style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#ff5555' }}
                     >
                       All
                     </button>
@@ -520,9 +520,9 @@ function PropertyDetailModal({ propertyId, onClose }: { propertyId: string; onCl
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.88)' }}>
-      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={onClose}>
             <X size={18} color="#888" />
           </button>
@@ -568,7 +568,7 @@ function PropertyDetailModal({ propertyId, onClose }: { propertyId: string; onCl
                     title={bought ? `${imp.name} ✓` : isNext ? `${imp.name} · ${formatCurrency(upgradeCost)}` : imp.name}
                     className="flex-1 py-3 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-95"
                     style={{
-                      background: bought ? 'rgba(255,107,0,0.18)' : '#1e1e1e',
+                      background: bought ? 'rgba(255,107,0,0.18)' : 'var(--bg-card)',
                       boxShadow: bought ? '0 0 10px rgba(255,107,0,0.3), inset 2px 2px 5px #0d0d0d' : NM_OUT,
                       border: isNext ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
                       opacity: i > level ? 0.3 : 1,
@@ -586,7 +586,7 @@ function PropertyDetailModal({ propertyId, onClose }: { propertyId: string; onCl
             {!maxed ? (
               <div
                 className="rounded-xl p-3"
-                style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}
+                style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -707,8 +707,8 @@ function RealEstateTab() {
       {/* My property modal */}
       {showMyProperty && (
         <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-          <div className="w-full max-h-[90vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-            <div className="px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <div className="w-full max-h-[90vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+            <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="font-bold text-lg text-white">My property</h3>
@@ -734,7 +734,7 @@ function RealEstateTab() {
                     onClick={() => setPropSort(opt.key)}
                     className="shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95"
                     style={{
-                      background: propSort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
+                      background: propSort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)',
                       boxShadow: NM_OUT,
                       color: propSort === opt.key ? '#fff' : '#666',
                     }}
@@ -776,7 +776,7 @@ function RealEstateTab() {
                           key={imp.name}
                           className="w-9 h-9 rounded-xl flex items-center justify-center text-sm"
                           style={{
-                            background: i < level ? 'rgba(255,107,0,0.18)' : '#1a1a1a',
+                            background: i < level ? 'rgba(255,107,0,0.18)' : 'var(--bg-base)',
                             boxShadow: i < level ? '0 0 6px rgba(255,107,0,0.3), inset 2px 2px 5px #0d0d0d' : 'inset 2px 2px 5px #0d0d0d',
                             border: i === level && !maxed ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
                             opacity: i > level ? 0.3 : 1,
@@ -804,8 +804,8 @@ function RealEstateTab() {
 
       {showMarket && (
         <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-          <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
               <div>
                 <h3 className="font-bold text-lg text-white">Real Estate Market</h3>
                 <p className="text-xs mt-0.5" style={{ color: '#666' }}>
@@ -838,7 +838,7 @@ function RealEstateTab() {
                           onClick={() => buyProperty(p.id)}
                           disabled={balance < p.cost}
                           className="nm-orange text-white px-4 py-2 rounded-xl text-sm font-bold shrink-0 disabled:opacity-40"
-                          style={balance < p.cost ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+                          style={balance < p.cost ? { background: 'var(--bg-card)', boxShadow: NM_OUT } : undefined}
                         >
                           {formatCurrency(p.cost)}
                         </button>
@@ -859,7 +859,7 @@ function RealEstateTab() {
                                 title={bought ? `${imp.name} ✓` : isNext ? `${imp.name} · ${formatCurrency(upgradeCost)}` : imp.name}
                                 className="w-10 h-10 rounded-xl flex items-center justify-center text-base transition-all active:scale-95"
                                 style={{
-                                  background: bought ? 'rgba(255,107,0,0.18)' : '#1a1a1a',
+                                  background: bought ? 'rgba(255,107,0,0.18)' : 'var(--bg-base)',
                                   boxShadow: bought ? '0 0 8px rgba(255,107,0,0.35), inset 2px 2px 5px #0d0d0d' : 'inset 2px 2px 5px #0d0d0d',
                                   border: isNext ? '1px solid rgba(255,107,0,0.55)' : '1px solid transparent',
                                   opacity: i > level ? 0.3 : 1,
@@ -915,8 +915,8 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.88)' }}>
-      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+      <div className="w-full max-h-[92vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <div
             className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
             style={{ background: coin.color, boxShadow: `0 0 18px ${coin.color}66` }}
@@ -950,7 +950,7 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
               { label: 'Base Price',   value: formatCurrency(coin.basePrice) },
               { label: 'Ticker',       value: coin.ticker },
             ].map(stat => (
-              <div key={stat.label} className="rounded-2xl p-3" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+              <div key={stat.label} className="rounded-2xl p-3" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
                 <p className="text-xs mb-0.5" style={{ color: '#666' }}>{stat.label}</p>
                 <p className="font-bold text-white text-sm">{stat.value}</p>
               </div>
@@ -959,7 +959,7 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
 
           {/* Holdings */}
           {holding && holding.amount > 0 ? (
-            <div className="rounded-2xl p-4" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
               <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>My Holdings</p>
               <div className="grid grid-cols-2 gap-y-2.5 text-sm">
                 <span style={{ color: '#888' }}>Amount owned</span>
@@ -976,19 +976,19 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl p-4 text-center" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+            <div className="rounded-2xl p-4 text-center" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
               <p className="text-sm" style={{ color: '#555' }}>You don't own any {coin.ticker} yet.</p>
             </div>
           )}
 
           {/* Quantity selector */}
-          <div className="rounded-2xl p-4" style={{ background: '#161616', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
+          <div className="rounded-2xl p-4" style={{ background: 'var(--bg-deep)', boxShadow: 'inset 2px 2px 5px #0d0d0d' }}>
             <p className="text-xs uppercase tracking-widest mb-3" style={{ color: '#555' }}>Quantity</p>
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setQty(q => Math.max(1, q - 1))}
                 className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
               >−</button>
               <input
                 type="number"
@@ -996,17 +996,17 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
                 value={qty}
                 onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
                 className="flex-1 text-center font-bold text-white text-lg rounded-xl py-2 outline-none"
-                style={{ background: '#1a1a1a', border: '1px solid #2a2a2a' }}
+                style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}
               />
               <button
                 onClick={() => setQty(q => q + 1)}
                 className="w-10 h-10 rounded-xl font-bold text-white text-lg flex items-center justify-center active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
               >+</button>
               <button
                 onClick={() => { const max = Math.floor(balance / price); setQty(max > 0 ? max : 1); }}
                 className="px-3 py-2 rounded-xl text-xs font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#FF6B00' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#FF6B00' }}
               >Max</button>
             </div>
             <div className="flex justify-between text-xs" style={{ color: '#666' }}>
@@ -1021,7 +1021,7 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
               onClick={() => { buyCrypto(coinId, qty); if (soundEnabled) playBuy(); }}
               disabled={balance < price * qty}
               className="flex-1 py-3 rounded-xl font-bold text-white disabled:opacity-40 active:scale-95 transition-all"
-              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+              style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
             >
               Buy {qty}
             </button>
@@ -1029,7 +1029,7 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
               <button
                 onClick={() => { sellCrypto(coinId, qty); if (soundEnabled) playSell(); }}
                 className="flex-1 py-3 rounded-xl font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#4CAF50' }}
               >
                 Sell {qty}
               </button>
@@ -1038,7 +1038,7 @@ function CryptoDetailModal({ coinId, onClose }: { coinId: string; onClose: () =>
               <button
                 onClick={() => { sellCrypto(coinId, holding.amount); if (soundEnabled) playSell(); }}
                 className="px-4 py-3 rounded-xl font-bold active:scale-95 transition-all"
-                style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+                style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#ff5555' }}
               >
                 All
               </button>
@@ -1069,8 +1069,8 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
   return (
     <>
     <div className="fixed inset-0 z-[60] flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-        <div className="px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+      <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+        <div className="px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           <div className="flex items-center justify-between mb-3">
             <div>
               <h3 className="font-bold text-lg text-white">Crypto Market</h3>
@@ -1089,7 +1089,7 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
             <button
               onClick={() => setQty(q => Math.max(1, q - 1))}
               className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
-              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
             >−</button>
             <input
               type="number"
@@ -1097,19 +1097,19 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
               value={qty}
               onChange={e => setQty(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
               className="w-16 text-center font-bold text-white text-sm rounded-lg py-1.5 outline-none"
-              style={{ background: '#161616', border: '1px solid #2a2a2a' }}
+              style={{ background: 'var(--bg-deep)', border: '1px solid var(--border-subtle)' }}
             />
             <button
               onClick={() => setQty(q => q + 1)}
               className="w-8 h-8 rounded-lg font-bold text-white flex items-center justify-center active:scale-95"
-              style={{ background: '#1e1e1e', boxShadow: NM_OUT }}
+              style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}
             >+</button>
             {[5, 10, 50].map(n => (
               <button
                 key={n}
                 onClick={() => setQty(n)}
                 className="px-2.5 py-1.5 rounded-lg text-xs font-bold active:scale-95"
-                style={{ background: qty === n ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: NM_OUT, color: qty === n ? '#fff' : '#888' }}
+                style={{ background: qty === n ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: NM_OUT, color: qty === n ? '#fff' : '#888' }}
               >{n}</button>
             ))}
           </div>
@@ -1128,7 +1128,7 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
                 onClick={() => setSort(opt.key)}
                 className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all"
                 style={{
-                  background: sort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e',
+                  background: sort === opt.key ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)',
                   boxShadow: NM_OUT,
                   color: sort === opt.key ? '#fff' : '#888',
                 }}
@@ -1181,7 +1181,7 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
                     onClick={() => { buyCrypto(coin.id, qty); if (soundEnabled) playBuy(); }}
                     disabled={balance < price * qty}
                     className="flex-1 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-40"
-                    style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : '#1e1e1e', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
+                    style={{ background: balance >= price * qty ? 'linear-gradient(135deg,#7B3F00,#FF6B00)' : 'var(--bg-card)', boxShadow: balance >= price * qty ? '0 3px 10px rgba(255,107,0,0.3)' : NM_OUT }}
                   >
                     Buy {qty}
                   </button>
@@ -1189,7 +1189,7 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => { sellCrypto(coin.id, qty); if (soundEnabled) playSell(); }}
                       className="flex-1 py-2 rounded-xl text-sm font-bold"
-                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#4CAF50' }}
+                      style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#4CAF50' }}
                     >
                       Sell {qty}
                     </button>
@@ -1198,7 +1198,7 @@ function CryptoModal({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => { sellCrypto(coin.id, holding.amount); if (soundEnabled) playSell(); }}
                       className="px-3 py-2 rounded-xl text-sm font-bold"
-                      style={{ background: '#1e1e1e', boxShadow: NM_OUT, color: '#ff5555' }}
+                      style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, color: '#ff5555' }}
                     >
                       All
                     </button>
@@ -1316,7 +1316,7 @@ function CryptoTab() {
                   onClick={() => { buyCrypto(coin.id, 1); if (soundEnabled) playBuy(); }}
                   disabled={balance < price}
                   className="nm-orange text-white px-5 py-2 rounded-xl text-sm font-bold disabled:opacity-40"
-                  style={balance < price ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+                  style={balance < price ? { background: 'var(--bg-card)', boxShadow: NM_OUT } : undefined}
                 >
                   Buy
                 </button>
@@ -1345,13 +1345,13 @@ export function InvestingPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: '#1a1a1a' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       {/* Header + tab strip */}
-      <div className="px-4 pt-12 pb-0 sticky top-0 z-10" style={{ background: '#1a1a1a' }}>
+      <div className="px-4 pt-12 pb-0 sticky top-0 z-10" style={{ background: 'var(--bg-base)' }}>
         <h1 className="text-2xl font-bold text-white mb-4">Investing</h1>
         <div
           className="flex rounded-2xl p-1 gap-1 mb-0"
-          style={{ background: '#161616', boxShadow: NM_IN }}
+          style={{ background: 'var(--bg-deep)', boxShadow: NM_IN }}
         >
           {tabs.map(t => (
             <button

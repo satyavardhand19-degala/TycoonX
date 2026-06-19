@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { Zap, Volume2, VolumeX } from 'lucide-react';
+import { Zap, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { formatCurrency, formatCurrencyFull } from '../utils/format';
 import { CLICK_UPGRADES } from '../data/gameData';
 import { playCoin, playBuy } from '../utils/sounds';
 
-const NM_OUT    = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
+const NM_OUT = 'var(--nm-out)';
 const TAP_IDLE  = 'inset 12px 12px 26px #0c0c0c, inset -10px -10px 20px #282828';
 const TAP_HIT   = '8px 8px 18px #0d0d0d, -6px -6px 16px #272727, 0 0 40px rgba(255,107,0,0.35)';
 const TAP_AUTO  = '8px 8px 18px #0d0d0d, -6px -6px 16px #272727, 0 0 55px rgba(255,107,0,0.55)';
@@ -26,6 +26,8 @@ export function EarningsPage() {
   const getPerClick       = useGameStore(s => s.getPerClick);
   const soundEnabled      = useGameStore(s => s.soundEnabled);
   const toggleSound       = useGameStore(s => s.toggleSound);
+  const theme             = useGameStore(s => s.theme);
+  const toggleTheme       = useGameStore(s => s.toggleTheme);
 
   const perClick          = getPerClick();
   const availableUpgrades = CLICK_UPGRADES.filter(u => !purchasedUpgrades.includes(u.id));
@@ -79,7 +81,7 @@ export function EarningsPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-5rem)]" style={{ background: '#1a1a1a' }}>
+    <div className="flex flex-col min-h-[calc(100vh-5rem)]" style={{ background: 'var(--bg-base)' }}>
       {/* Header */}
       <div className="px-5 pt-12 pb-4">
         <div className="flex items-center justify-between">
@@ -95,6 +97,14 @@ export function EarningsPage() {
           </h1>
           <div className="flex items-center gap-2">
           <button
+            onClick={toggleTheme}
+            className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center"
+          >
+            {theme === 'dark'
+              ? <Sun size={15} color="#FF6B00" />
+              : <Moon size={15} color="#FF6B00" />}
+          </button>
+          <button
             onClick={toggleSound}
             className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center"
           >
@@ -105,7 +115,7 @@ export function EarningsPage() {
           <div
             className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
             style={{
-              background: '#1e1e1e',
+              background: 'var(--bg-card)',
               boxShadow: autoClick
                 ? '0 0 12px rgba(255,107,0,0.7), 3px 3px 8px #0d0d0d'
                 : NM_OUT,
@@ -157,7 +167,7 @@ export function EarningsPage() {
       <div className="mx-5 mb-6">
         <div
           className="rounded-xl px-5 py-3 inline-flex items-center gap-2"
-          style={{ background: '#161616', boxShadow: 'inset 4px 4px 8px #0d0d0d, inset -3px -3px 6px #252525' }}
+          style={{ background: 'var(--bg-deep)', boxShadow: 'inset 4px 4px 8px #0d0d0d, inset -3px -3px 6px #252525' }}
         >
           <span className="font-bold text-white">₹ {perClick.toLocaleString('en-IN')}</span>
           <span className="text-sm" style={{ color: '#888' }}>per click</span>
@@ -172,7 +182,7 @@ export function EarningsPage() {
           style={{
             width: 210,
             height: 210,
-            background: '#1a1a1a',
+            background: 'var(--bg-base)',
             boxShadow: autoClick ? TAP_AUTO : tapped ? TAP_HIT : TAP_IDLE,
             transition: 'box-shadow 0.13s ease',
             cursor: 'pointer',

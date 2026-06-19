@@ -41,6 +41,7 @@ interface GameState {
   totalTaxPaid: number;
   lastSeenAt: number;
   soundEnabled: boolean;
+  theme: 'dark' | 'light';
 
   // Actions
   click: () => void;
@@ -67,6 +68,7 @@ interface GameState {
   loadSlot: (slot: number) => void;
   applyOfflineEarnings: (seconds: number) => number;
   toggleSound: () => void;
+  toggleTheme: () => void;
   resetGame: () => void;
 
   login: (username: string, role: UserRole, password?: string) => string | null;
@@ -126,6 +128,7 @@ export const useGameStore = create<GameState>()(
       totalTaxPaid: 0,
       lastSeenAt: Date.now(),
       soundEnabled: true,
+      theme: 'dark' as 'dark' | 'light',
 
       click: () => set(state => {
         state.balance += get().getPerClick();
@@ -320,6 +323,7 @@ export const useGameStore = create<GameState>()(
       },
 
       toggleSound: () => set(state => { state.soundEnabled = !state.soundEnabled; }),
+      toggleTheme: () => set(state => { state.theme = state.theme === 'dark' ? 'light' : 'dark'; }),
 
       resetGame: () => set(state => {
         state.balance = 0;

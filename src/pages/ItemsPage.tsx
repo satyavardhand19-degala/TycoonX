@@ -6,8 +6,8 @@ import { CARS, PLANES, YACHTS, RESIDENCE_TIERS, COIN_COLLECTION, PAINTING_COLLEC
 
 type ShopType = 'cars' | 'planes' | 'yachts' | 'coins' | 'paintings' | null;
 
-const NM_OUT = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
-const NM_IN  = 'inset 5px 5px 11px #0d0d0d, inset -4px -4px 9px #272727';
+const NM_OUT = 'var(--nm-out)';
+const NM_IN  = 'var(--nm-in)';
 
 const SHOP_TITLE: Record<NonNullable<ShopType>, string> = {
   cars: 'Car Showroom', planes: 'Aircraft Shop', yachts: 'Yacht Shop',
@@ -37,7 +37,7 @@ export function ItemsPage() {
   const paintOwned  = paintingCollection.filter(Boolean).length;
 
   return (
-    <div className="min-h-screen pb-6" style={{ background: '#1a1a1a' }}>
+    <div className="min-h-screen pb-6" style={{ background: 'var(--bg-base)' }}>
       <div className="px-4 pt-12">
         <h1 className="text-2xl font-bold text-white mb-5">Items</h1>
 
@@ -88,7 +88,7 @@ export function ItemsPage() {
         {/* Residence */}
         <div
           className="rounded-2xl p-5 mb-6"
-          style={{ background: '#1e1e1e', boxShadow: NM_OUT, borderLeft: '3px solid #FF6B00' }}
+          style={{ background: 'var(--bg-card)', boxShadow: NM_OUT, borderLeft: '3px solid #FF6B00' }}
         >
           <div className="flex items-start justify-between">
             <div>
@@ -104,7 +104,7 @@ export function ItemsPage() {
                 style={
                   balance >= nextTier.cost
                     ? { background: 'linear-gradient(135deg, #FF8C00, #FF5500)', color: '#fff', boxShadow: '3px 3px 10px rgba(255,107,0,0.4)' }
-                    : { background: '#161616', color: '#555', boxShadow: NM_IN }
+                    : { background: 'var(--bg-deep)', color: '#555', boxShadow: NM_IN }
                 }
               >
                 <ChevronUp size={14} />
@@ -113,7 +113,7 @@ export function ItemsPage() {
             )}
           </div>
           {/* Progress bar */}
-          <div className="h-1.5 rounded-full mt-4" style={{ background: '#161616', boxShadow: NM_IN }}>
+          <div className="h-1.5 rounded-full mt-4" style={{ background: 'var(--bg-deep)', boxShadow: NM_IN }}>
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -156,8 +156,8 @@ export function ItemsPage() {
       {/* Shop modal */}
       {shop && (
         <div className="fixed inset-0 z-50 flex items-end" style={{ background: 'rgba(0,0,0,0.8)' }}>
-          <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: '#1a1a1a', boxShadow: '-2px -6px 30px #0a0a0a' }}>
-            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #2a2a2a' }}>
+          <div className="w-full max-h-[85vh] flex flex-col rounded-t-3xl" style={{ background: 'var(--bg-base)', boxShadow: '-2px -6px 30px #0a0a0a' }}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
               <h3 className="font-bold text-lg text-white">{SHOP_TITLE[shop]}</h3>
               <button className="nm-btn w-9 h-9 rounded-xl flex items-center justify-center" onClick={() => setShop(null)}>
                 <X size={18} color="#888" />
@@ -194,7 +194,7 @@ function VRow({ item, owned, canBuy, onBuy }: { item: { emoji: string; name: str
           onClick={onBuy}
           disabled={!canBuy}
           className="nm-orange text-white px-4 py-2 rounded-xl text-sm font-bold shrink-0 disabled:opacity-40"
-          style={!canBuy ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+          style={!canBuy ? { background: 'var(--bg-card)', boxShadow: NM_OUT } : undefined}
         >
           {formatCurrency(item.cost)}
         </button>
@@ -217,7 +217,7 @@ function CRow({ emoji, name, cost, owned, canBuy, onBuy }: { emoji: string; name
           onClick={onBuy}
           disabled={!canBuy}
           className="nm-orange text-white px-4 py-2 rounded-xl text-sm font-bold shrink-0 disabled:opacity-40"
-          style={!canBuy ? { background: '#1e1e1e', boxShadow: NM_OUT } : undefined}
+          style={!canBuy ? { background: 'var(--bg-card)', boxShadow: NM_OUT } : undefined}
         >
           {formatCurrency(cost)}
         </button>

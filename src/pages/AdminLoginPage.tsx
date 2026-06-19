@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
 import { ShieldCheck } from 'lucide-react';
 
-const NM_OUT = '6px 6px 14px #0d0d0d, -5px -5px 12px #2b2b2b';
-const NM_IN  = 'inset 2px 2px 6px #0d0d0d, inset -2px -2px 6px #272727';
+const NM_OUT = 'var(--nm-out)';
+const NM_IN  = 'var(--nm-in-sm)';
 
 export const AdminLoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -24,7 +24,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden" style={{ background: '#1a1a1a' }}>
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden" style={{ background: 'var(--bg-base)' }}>
 
       {/* Background glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full opacity-8 pointer-events-none"
@@ -38,12 +38,12 @@ export const AdminLoginPage: React.FC = () => {
         </div>
 
         {/* Card */}
-        <div className="rounded-3xl p-6" style={{ background: '#1e1e1e', boxShadow: NM_OUT }}>
+        <div className="rounded-3xl p-6" style={{ background: 'var(--bg-card)', boxShadow: NM_OUT }}>
 
           {/* Admin badge */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3"
-              style={{ background: '#161616', boxShadow: NM_IN }}>
+              style={{ background: 'var(--bg-deep)', boxShadow: NM_IN }}>
               <ShieldCheck size={30} style={{ color: '#FF6B00' }} />
             </div>
             <h1 className="text-xl font-bold text-white">Admin Access</h1>
@@ -68,7 +68,7 @@ export const AdminLoginPage: React.FC = () => {
                 onChange={e => setUsername(e.target.value)}
                 placeholder="Enter username..."
                 className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
-                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                style={{ background: 'var(--bg-deep)', boxShadow: NM_IN, border: 'none' }}
                 onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
                 onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
@@ -85,7 +85,7 @@ export const AdminLoginPage: React.FC = () => {
                 onChange={e => setAdminKey(e.target.value)}
                 placeholder="••••••••"
                 className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-all"
-                style={{ background: '#161616', boxShadow: NM_IN, border: 'none' }}
+                style={{ background: 'var(--bg-deep)', boxShadow: NM_IN, border: 'none' }}
                 onFocus={e => (e.target.style.boxShadow = `${NM_IN}, 0 0 0 2px #FF6B0066`)}
                 onBlur={e => (e.target.style.boxShadow = NM_IN)}
                 required
