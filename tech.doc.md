@@ -357,13 +357,13 @@ Locale: `en-IN` (Indian Rupee formatting).
 ## 11. Build & Dev
 
 ```bash
-npm run dev       # Vite dev server → http://localhost:5173
+npm run dev       # Vite dev server → http://localhost:5137
 npm run build     # TypeScript check + Vite production build → dist/
 npm run preview   # Serve dist/ locally
 npm run test      # Vitest test runner
 ```
 
-No backend. No environment variables needed. Open `localhost:5173` in browser to play.
+No backend. No environment variables needed. Open `localhost:5137` in browser to play.
 
 ---
 

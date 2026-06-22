@@ -16,7 +16,12 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5137)",
       "Bash(npx kill-port *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "Skill(run)",
+      "PowerShell(cd D:\\\\projects_files\\\\TycoonX; Start-Process powershell -ArgumentList '-NoExit', '-Command', 'npm run dev' -WindowStyle Normal)",
+      "PowerShell(cd D:\\\\projects_files\\\\TycoonX; Start-Process powershell -ArgumentList '-NoExit', '-Command', 'npm run dev -- --port 5137' -WindowStyle Normal)",
+      "Bash(node *)"
     ]
   }
 }
